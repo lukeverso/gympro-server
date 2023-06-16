@@ -1,0 +1,130 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+     provider = "prisma-client-js"
+}
+
+generator erd {
+     provider = "prisma-erd-generator"
+}
+
+datasource db {
+     provider = "sqlite"
+     url      = env("DATABASE_URL")
+}
+
+model User {
+     id        String   @id @default(cuid())
+     name      String
+     username  String?  @unique
+     email     String?  @unique
+     password  String
+     birthdate DateTime
+     telephone String?
+
+     createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
+
+     measure    Measures @relation(fields: [measuresId], references: [id])
+     measuresId String
+
+     teacher   Teacher @relation(fields: [teacherId], references: [id])
+     teacherId String
+
+     address   Address @relation(fields: [addressId], references: [id])
+     addressId String
+
+     exercise Exercise[]
+}
+
+model Teacher {
+     id        String   @id @default(cuid())
+     name      String
+     username  String   @unique
+     email     String?  @unique
+     password  String
+     birthdate DateTime
+     telephone String?
+
+     createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
+
+     users User[]
+
+     gym   Gym    @relation(fields: [gymId], references: [id])
+     gymId String
+}
+
+model Gym {
+     id        String  @id @default(cuid())
+     name      String
+     telephone String?
+
+     createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
+
+     teachers Teacher[]
+}
+
+model Address {
+     id         String  @id @default(cuid())
+     street     String
+     number     String
+     complement String?
+     code       String
+     city       String
+     country    String
+
+     createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
+
+     users User[]
+}
+
+model Measures {
+     id       String  @id @default(cuid())
+     height   String
+     weight   String
+     bmi      String
+     wingspan String?
+     waist    String?
+     hip      String?
+     arm      String?
+     thigh    String?
+     bodyFat  String?
+
+     createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
+
+     users User[]
+}
+
+model Exercise {
+     id          String   @id @default(cuid())
+     userId      String
+     objective   String
+     startDate   DateTime
+     endDate     DateTime
+     annotations String?
+     active      Boolean
+
+     createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
+
+     User User @relation(fields: [userId], references: [id])
+
+     exerciseList ExerciseItem[]
+}
+
+model ExerciseItem {
+     id         String @id @default(cuid())
+     exerciseId String
+     type       String
+     list       String
+
+     createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
+
+     Exercise Exercise @relation(fields: [exerciseId], references: [id])
+}
