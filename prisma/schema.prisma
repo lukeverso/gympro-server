@@ -20,7 +20,7 @@ model User {
      username  String?  @unique
      email     String?  @unique
      password  String
-     birthdate DateTime
+     birthdate String
      telephone String?
 
      createdAt DateTime @default(now())
@@ -44,7 +44,7 @@ model Teacher {
      username  String   @unique
      email     String?  @unique
      password  String
-     birthdate DateTime
+     birthdate String
      telephone String?
 
      createdAt DateTime @default(now())
@@ -104,8 +104,8 @@ model Exercise {
      id          String   @id @default(cuid())
      userId      String
      objective   String
-     startDate   DateTime
-     endDate     DateTime
+     startDate   String
+     endDate     String
      annotations String?
      active      Boolean
 
