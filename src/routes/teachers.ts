@@ -3,4 +3,4 @@ import { prisma } from '../lib/prisma';
 import { z } from 'zod';
 import { authenticate } from '../plugins/authenticate';
 
-export async function teachersRoutes(fastify: FastifyInstance) {}
+export async function teachersRoutes(fastify: FastifyInstance) {};

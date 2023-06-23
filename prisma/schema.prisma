@@ -15,60 +15,34 @@ datasource db {
 }
 
 model User {
-     id        String   @id @default(cuid())
+     id        String  @id @default(cuid())
      name      String
-     username  String?  @unique
-     email     String?  @unique
+     username  String  @unique
+     email     String? @unique
      password  String
      birthdate String
      telephone String?
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
-
-     measure    Measures @relation(fields: [measuresId], references: [id])
-     measuresId String
-
-     teacher   Teacher @relation(fields: [teacherId], references: [id])
-     teacherId String
-
-     address   Address @relation(fields: [addressId], references: [id])
-     addressId String
-
-     exercise Exercise[]
 }
 
 model Teacher {
-     id        String   @id @default(cuid())
+     id        String  @id @default(cuid())
      name      String
-     username  String   @unique
-     email     String?  @unique
+     username  String  @unique
+     email     String? @unique
      password  String
      birthdate String
      telephone String?
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
-
-     users User[]
-
-     gym   Gym    @relation(fields: [gymId], references: [id])
-     gymId String
-}
-
-model Gym {
-     id        String  @id @default(cuid())
-     name      String
-     telephone String?
-
-     createdAt DateTime @default(now())
-     updatedAt DateTime @updatedAt
-
-     teachers Teacher[]
 }
 
 model Address {
      id         String  @id @default(cuid())
+     userId     String
      street     String
      number     String
      complement String?
@@ -78,15 +52,14 @@ model Address {
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
-
-     users User[]
 }
 
 model Measures {
      id       String  @id @default(cuid())
-     height   String
-     weight   String
-     bmi      String
+     userId   String
+     height   String?
+     weight   String?
+     bmi      String?
      wingspan String?
      waist    String?
      hip      String?
@@ -96,12 +69,10 @@ model Measures {
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
-
-     users User[]
 }
 
 model Exercise {
-     id          String   @id @default(cuid())
+     id          String  @id @default(cuid())
      userId      String
      objective   String
      startDate   String
@@ -111,10 +82,6 @@ model Exercise {
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
-
-     User User @relation(fields: [userId], references: [id])
-
-     exerciseList ExerciseItem[]
 }
 
 model ExerciseItem {
@@ -125,6 +92,4 @@ model ExerciseItem {
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
-
-     Exercise Exercise @relation(fields: [exerciseId], references: [id])
 }
