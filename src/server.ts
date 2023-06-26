@@ -4,7 +4,6 @@ import jwt from '@fastify/jwt';
 
 import { addressesRoutes } from './routes/addresses';
 import { exercisesRoutes } from './routes/exercises';
-import { gymsRoutes } from './routes/gyms';
 import { measuresRoutes } from './routes/measures';
 import { teachersRoutes } from './routes/teachers';
 import { usersRoutes } from './routes/users';
@@ -23,7 +22,6 @@ fastify.register(jwt, {
 
 fastify.register(addressesRoutes);
 fastify.register(exercisesRoutes);
-fastify.register(gymsRoutes);
 fastify.register(measuresRoutes);
 fastify.register(teachersRoutes);
 fastify.register(usersRoutes);

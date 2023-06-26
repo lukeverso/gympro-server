@@ -22,9 +22,15 @@ model User {
      password  String
      birthdate String
      telephone String?
+     teacherId String?
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
+
+     Teacher  Teacher?   @relation(fields: [teacherId], references: [id])
+     Exercise Exercise[]
+     Address  Address[]
+     Measures Measures[]
 }
 
 model Teacher {
@@ -35,6 +41,8 @@ model Teacher {
      password  String
      birthdate String
      telephone String?
+
+     students User[]
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
@@ -49,6 +57,8 @@ model Address {
      code       String
      city       String
      country    String
+
+     user User @relation(fields: [userId], references: [id])
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
@@ -67,6 +77,8 @@ model Measures {
      thigh    String?
      bodyFat  String?
 
+     user User @relation(fields: [userId], references: [id])
+
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 }
@@ -80,6 +92,10 @@ model Exercise {
      annotations String?
      active      Boolean
 
+     exercises ExerciseItem[]
+
+     user User @relation(fields: [userId], references: [id])
+
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 }
@@ -92,4 +108,6 @@ model ExerciseItem {
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
+
+     Exercise Exercise @relation(fields: [exerciseId], references: [id])
 }
