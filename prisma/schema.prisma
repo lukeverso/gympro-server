@@ -14,27 +14,31 @@ datasource db {
      url      = env("DATABASE_URL")
 }
 
-model User {
-     id        String  @id @default(cuid())
+model Student {
+     id        String  @id @default(uuid())
      name      String
      username  String  @unique
      email     String? @unique
      password  String
      birthdate String
      telephone String?
-     teacherId String?
+
+     addressId  String?
+     teacherId  String?
+     measuresId String?
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 
-     Teacher  Teacher?   @relation(fields: [teacherId], references: [id])
-     Exercise Exercise[]
-     Address  Address[]
-     Measures Measures[]
+     address  Address?  @relation(fields: [addressId], references: [id], onDelete: Cascade)
+     teacher  Teacher?  @relation(fields: [teacherId], references: [id])
+     measures Measures? @relation(fields: [measuresId], references: [id], onDelete: Cascade)
+
+     exercises Exercise[]
 }
 
 model Teacher {
-     id        String  @id @default(cuid())
+     id        String  @id @default(uuid())
      name      String
      username  String  @unique
      email     String? @unique
@@ -42,15 +46,15 @@ model Teacher {
      birthdate String
      telephone String?
 
-     students User[]
-
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
+
+     students Student[]
 }
 
 model Address {
-     id         String  @id @default(cuid())
-     userId     String
+     id         String  @id @default(uuid())
+     studentId  String  @unique
      street     String
      number     String
      complement String?
@@ -58,34 +62,34 @@ model Address {
      city       String
      country    String
 
-     user User @relation(fields: [userId], references: [id])
-
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
+
+     student Student[]
 }
 
 model Measures {
-     id       String  @id @default(cuid())
-     userId   String
-     height   String?
-     weight   String?
-     bmi      String?
-     wingspan String?
-     waist    String?
-     hip      String?
-     arm      String?
-     thigh    String?
-     bodyFat  String?
-
-     user User @relation(fields: [userId], references: [id])
+     id        String  @id @default(uuid())
+     studentId String  @unique
+     height    String?
+     weight    String?
+     bmi       String?
+     wingspan  String?
+     waist     String?
+     hip       String?
+     arm       String?
+     thigh     String?
+     bodyFat   String?
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
+
+     student Student[]
 }
 
 model Exercise {
-     id          String  @id @default(cuid())
-     userId      String
+     id          String  @id @default(uuid())
+     studentId   String  @unique
      objective   String
      startDate   String
      endDate     String
@@ -94,20 +98,20 @@ model Exercise {
 
      exercises ExerciseItem[]
 
-     user User @relation(fields: [userId], references: [id])
+     student Student @relation(fields: [studentId], references: [id])
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 }
 
 model ExerciseItem {
-     id         String @id @default(cuid())
+     id         String @id @default(uuid())
      exerciseId String
      type       String
      list       String
 
+     exercise Exercise @relation(fields: [exerciseId], references: [id])
+
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
-
-     Exercise Exercise @relation(fields: [exerciseId], references: [id])
 }
