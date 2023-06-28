@@ -55,62 +55,62 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           return { students };
      });
 
-     // fastify.get('/students/:id', {
-     //      preHandler: authenticate
-     // }, async (request, reply) => {
-     //      const studentParams = z.object({
-     //           id: z.string().uuid()
-     //      });
+     fastify.get('/students/:id', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          const studentParams = z.object({
+               id: z.string().uuid()
+          });
 
-     //      const { id } = studentParams.parse(request.params);
+          const { id } = studentParams.parse(request.params);
 
-     //      const student = await prisma.student.findUnique({
-     //           where: {
-     //                id
-     //           },
-     //           include: {
-     //                address: {
-     //                     select: {
-     //                          city: true,
-     //                          code: true,
-     //                          complement: true,
-     //                          country: true,
-     //                          number: true,
-     //                          street: true,
-     //                     },
-     //                },
-     //                exercises: {
-     //                     select: {
-     //                          active: true,
-     //                          objective: true,
-     //                          exercises: true
-     //                     },
-     //                },
-     //                measures: {
-     //                     select: {
-     //                          arm: true,
-     //                          bmi: true,
-     //                          bodyFat: true,
-     //                          height: true,
-     //                          hip: true,
-     //                          thigh: true,
-     //                          waist: true,
-     //                          weight: true,
-     //                          wingspan: true
-     //                     },
-     //                },
-     //                teacher: {
-     //                     select: {
-     //                          name: true,
-     //                          username: true,
-     //                          email: true
-     //                     },
-     //                }
-     //           }
-     //      });
+          const student = await prisma.student.findUnique({
+               where: {
+                    id
+               },
+               include: {
+                    address: {
+                         select: {
+                              city: true,
+                              code: true,
+                              complement: true,
+                              country: true,
+                              number: true,
+                              street: true,
+                         },
+                    },
+                    exercises: {
+                         select: {
+                              active: true,
+                              objective: true,
+                              exercises: true
+                         },
+                    },
+                    measures: {
+                         select: {
+                              arm: true,
+                              bmi: true,
+                              bodyFat: true,
+                              height: true,
+                              hip: true,
+                              thigh: true,
+                              waist: true,
+                              weight: true,
+                              wingspan: true
+                         },
+                    },
+                    teacher: {
+                         select: {
+                              name: true,
+                              username: true,
+                              email: true
+                         },
+                    }
+               }
+          });
 
-     //      return { student };
-     // });
+          return { student };
+     });
 
      fastify.post('/students', async (request, reply) => {
           try {
