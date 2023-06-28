@@ -4,7 +4,9 @@ import { z } from 'zod';
 import { authenticate } from '../plugins/authenticate';
 
 export async function addressesRoutes(fastify: FastifyInstance) {
-     fastify.get('/addresses', async (request, reply) => {
+     fastify.get('/addresses', {
+          preHandler: authenticate
+     }, async (request, reply) => {
           const addresses = await prisma.address.findMany({
                select: {
                     city: true,
@@ -25,9 +27,11 @@ export async function addressesRoutes(fastify: FastifyInstance) {
           return { addresses };
      });
 
-     fastify.post('/addresses', async (request, reply) => {
+     fastify.post('/addresses', {
+          preHandler: authenticate
+     }, async (request, reply) => {
           try {
-               const studentBody = z.object({
+               const addressesSchema = z.object({
                     studentId: z.string().uuid(),
                     street: z.string(),
                     number: z.string(),
@@ -37,17 +41,17 @@ export async function addressesRoutes(fastify: FastifyInstance) {
                     country: z.string()
                });
 
-               const studentData = studentBody.parse(request.body);
+               const addressesBody = addressesSchema.parse(request.body);
 
                await prisma.address.create({
                     data: {
-                         studentId: studentData.studentId,
-                         street: studentData.street,
-                         number: studentData.number,
-                         complement: studentData.complement,
-                         code: studentData.code,
-                         city: studentData.city,
-                         country: studentData.country
+                         studentId: addressesBody.studentId,
+                         street: addressesBody.street,
+                         number: addressesBody.number,
+                         complement: addressesBody.complement,
+                         code: addressesBody.code,
+                         city: addressesBody.city,
+                         country: addressesBody.country
                     }
                });
 
@@ -65,14 +69,16 @@ export async function addressesRoutes(fastify: FastifyInstance) {
           };
      });
 
-     fastify.put('/addresses/:id', async (request, reply) => {
+     fastify.put('/addresses/:id', {
+          preHandler: authenticate
+     }, async (request, reply) => {
           const studentParams = z.object({
                id: z.string().uuid()
           });
 
           const studentParamsData = studentParams.parse(request.params);
 
-          const studentBody = z.object({
+          const addressesSchema = z.object({
                studentId: z.string().uuid(),
                street: z.string(),
                number: z.string(),
@@ -82,6 +88,6 @@ export async function addressesRoutes(fastify: FastifyInstance) {
                country: z.string()
           });
 
-          const studentData = studentBody.parse(request.body);
+          const addressesBody = addressesSchema.parse(request.body);
      });
 };

@@ -1,5 +1,7 @@
 import { FastifyRequest } from 'fastify';
 
 export async function authenticate(request: FastifyRequest) {
-     await request.jwtVerify();
+     const response = await request.jwtVerify();
+
+     console.log(response);
 };

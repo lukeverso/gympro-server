@@ -2,10 +2,9 @@ import { FastifyInstance } from 'fastify';
 import { prisma } from '../lib/prisma';
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
-import fastifyJwt from '@fastify/jwt';
 
 export async function authenticationRoutes(fastify: FastifyInstance) {
-     fastify.post('/login', async (request, reply) => {
+     fastify.post('/login/students', async (request, reply) => {
           const loginBody = z.object({
                email: z.string(),
                password: z.string()
@@ -13,18 +12,18 @@ export async function authenticationRoutes(fastify: FastifyInstance) {
 
           const { email, password } = loginBody.parse(request.body);
 
-          const userExists = await prisma.student.findFirst({
+          const studentExists = await prisma.student.findFirst({
                where: {
                     email
                },
           });
 
-          if (!userExists) return reply.status(400).send({
+          if (!studentExists) return reply.status(400).send({
                status: 'error',
                message: 'User not found.'
           });
 
-          const passwordMatch = await bcrypt.compare(password, userExists.password);
+          const passwordMatch = await bcrypt.compare(password, studentExists.password);
 
           if (!passwordMatch) return reply.status(400).send({
                status: 'error',
@@ -32,11 +31,56 @@ export async function authenticationRoutes(fastify: FastifyInstance) {
           });
 
           const token = fastify.jwt.sign({
-               email: userExists.email,
-               username: userExists.username
+               email: studentExists.email,
+               username: studentExists.username
           }, {
-               sub: userExists.id,
-               expiresIn: ''
+               sub: studentExists.id,
+               expiresIn: '7 days'
+          });
+
+          return reply.status(200).send({
+               token,
+               message: 'Authenticated successfully.'
+          });
+     });
+
+     fastify.post('/login/teachers', async (request, reply) => {
+          const loginBody = z.object({
+               email: z.string(),
+               password: z.string()
+          });
+
+          const { email, password } = loginBody.parse(request.body);
+
+          const teacherExists = await prisma.teacher.findFirst({
+               where: {
+                    email
+               },
+          });
+
+          if (!teacherExists) return reply.status(400).send({
+               status: 'error',
+               message: 'User not found.'
+          });
+
+          const passwordMatch = await bcrypt.compare(password, teacherExists.password);
+
+          if (!passwordMatch) return reply.status(400).send({
+               status: 'error',
+               message: 'Passwords do not match.'
+          });
+
+          const token = fastify.jwt.sign({
+               email: teacherExists.email,
+               username: teacherExists.username
+          }, {
+               sub: teacherExists.id,
+               expiresIn: '7 days'
+          });
+
+          return reply.status(200).send({
+               token,
+               message: 'Authenticated successfully.'
           });
      });
 };

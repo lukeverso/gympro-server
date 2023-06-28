@@ -4,7 +4,9 @@ import { z } from 'zod';
 import { authenticate } from '../plugins/authenticate';
 
 export async function exercisesRoutes(fastify: FastifyInstance) {
-     fastify.get('/exercises', async (request, reply) => {
+     fastify.get('/exercises', {
+          preHandler: authenticate
+     }, async (request, reply) => {
           const exercises = await prisma.exercise.findMany({
                select: {
                     active: true,

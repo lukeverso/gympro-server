@@ -6,9 +6,11 @@ import bcrypt from 'bcrypt';
 
 const salt = 10;
 
-export async function usersRoutes(fastify: FastifyInstance) {
-     fastify.get('/users', async (request, reply) => {
-          const users = await prisma.student.findMany({
+export async function studentsRoutes(fastify: FastifyInstance) {
+     fastify.get('/students', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          const students = await prisma.student.findMany({
                include: {
                     address: {
                          select: {
@@ -50,12 +52,69 @@ export async function usersRoutes(fastify: FastifyInstance) {
                }
           });
 
-          return { users };
+          return { students };
      });
 
-     fastify.post('/users', async (request, reply) => {
+     // fastify.get('/students/:id', {
+     //      preHandler: authenticate
+     // }, async (request, reply) => {
+     //      const studentParams = z.object({
+     //           id: z.string().uuid()
+     //      });
+
+     //      const { id } = studentParams.parse(request.params);
+
+     //      const student = await prisma.student.findUnique({
+     //           where: {
+     //                id
+     //           },
+     //           include: {
+     //                address: {
+     //                     select: {
+     //                          city: true,
+     //                          code: true,
+     //                          complement: true,
+     //                          country: true,
+     //                          number: true,
+     //                          street: true,
+     //                     },
+     //                },
+     //                exercises: {
+     //                     select: {
+     //                          active: true,
+     //                          objective: true,
+     //                          exercises: true
+     //                     },
+     //                },
+     //                measures: {
+     //                     select: {
+     //                          arm: true,
+     //                          bmi: true,
+     //                          bodyFat: true,
+     //                          height: true,
+     //                          hip: true,
+     //                          thigh: true,
+     //                          waist: true,
+     //                          weight: true,
+     //                          wingspan: true
+     //                     },
+     //                },
+     //                teacher: {
+     //                     select: {
+     //                          name: true,
+     //                          username: true,
+     //                          email: true
+     //                     },
+     //                }
+     //           }
+     //      });
+
+     //      return { student };
+     // });
+
+     fastify.post('/students', async (request, reply) => {
           try {
-               const studentBody = z.object({
+               const studentSchema = z.object({
                     name: z.string(),
                     username: z.string(),
                     email: z.string().email(),
@@ -64,16 +123,16 @@ export async function usersRoutes(fastify: FastifyInstance) {
                     telephone: z.string(),
                });
 
-               const studentData = studentBody.parse(request.body);
+               const studentBody = studentSchema.parse(request.body);
 
                const studentExists = await prisma.student.findFirst({
                     where: {
                          OR: [
                               {
-                                   username: studentData.username
+                                   username: studentBody.username
                               },
                               {
-                                   email: studentData.email
+                                   email: studentBody.email
                               },
                          ],
                     },
@@ -84,16 +143,16 @@ export async function usersRoutes(fastify: FastifyInstance) {
                     message: 'Student already exists.'
                });
 
-               const hashedPassword = await bcrypt.hash(studentData.password, salt);
+               const hashedPassword = await bcrypt.hash(studentBody.password, salt);
 
                const student = await prisma.student.create({
                     data: {
-                         name: studentData.name,
-                         username: studentData.username,
-                         email: studentData.email,
+                         name: studentBody.name,
+                         username: studentBody.username,
+                         email: studentBody.email,
                          password: hashedPassword,
-                         birthdate: studentData.birthdate,
-                         telephone: studentData.telephone
+                         birthdate: studentBody.birthdate,
+                         telephone: studentBody.telephone
                     }
                });
 
@@ -112,7 +171,9 @@ export async function usersRoutes(fastify: FastifyInstance) {
           };
      });
 
-     fastify.put('/users/:id', async (request, reply) => {
+     fastify.put('/students/:id', {
+          preHandler: authenticate
+     }, async (request, reply) => {
           try {
                const studentParams = z.object({
                     id: z.string().uuid()
@@ -131,7 +192,12 @@ export async function usersRoutes(fastify: FastifyInstance) {
                     message: 'Student not found.'
                });
 
-               const studentBody = z.object({
+               if (id !== studentExists.id) return reply.status(400).send({
+                    status: 'error',
+                    message: "You cannot update another user's data."
+               });
+
+               const studentSchema = z.object({
                     name: z.string(),
                     username: z.string(),
                     email: z.string().email().nullable(),
@@ -140,20 +206,20 @@ export async function usersRoutes(fastify: FastifyInstance) {
                     telephone: z.string()
                });
 
-               const studentDatarmations = studentBody.parse(request.body);
+               const studentBody = studentSchema.parse(request.body);
 
-               const hashedPassword = await bcrypt.hash(studentDatarmations.password, salt);
+               const hashedPassword = await bcrypt.hash(studentBody.password, salt);
 
                await prisma.student.update({
                     where: {
                          id
                     },
                     data: {
-                         name: studentDatarmations.name,
-                         username: studentDatarmations.username,
-                         email: studentDatarmations.email,
-                         birthdate: studentDatarmations.birthdate,
-                         telephone: studentDatarmations.telephone,
+                         name: studentBody.name,
+                         username: studentBody.username,
+                         email: studentBody.email,
+                         birthdate: studentBody.birthdate,
+                         telephone: studentBody.telephone,
                          password: hashedPassword
                     }
                });
@@ -172,7 +238,9 @@ export async function usersRoutes(fastify: FastifyInstance) {
           };
      });
 
-     fastify.delete('/users/:id', async (request, reply) => {
+     fastify.delete('/students/:id', {
+          preHandler: authenticate
+     }, async (request, reply) => {
           try {
                const studentParams = z.object({
                     id: z.string().uuid()

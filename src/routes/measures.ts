@@ -4,7 +4,9 @@ import { z } from 'zod';
 import { authenticate } from '../plugins/authenticate';
 
 export async function measuresRoutes(fastify: FastifyInstance) {
-     fastify.get('/measures', async (request, reply) => {
+     fastify.get('/measures', {
+          preHandler: authenticate
+     }, async (request, reply) => {
           const measures = await prisma.measures.findMany({
                select: {
                     arm: true,
