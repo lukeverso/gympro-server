@@ -30,6 +30,24 @@ export async function teachersRoutes(fastify: FastifyInstance) {
           return { teachers };
      });
 
+     fastify.get('/teachers/:id', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          const teacherParams = z.object({
+               id: z.string().uuid()
+          });
+
+          const { id } = teacherParams.parse(request.params);
+
+          const teacher = await prisma.teacher.findUnique({
+               where: {
+                    id
+               }
+          });
+
+          return { teacher };
+     });
+
      fastify.post('/teachers', async (request, reply) => {
           try {
                const teacherBody = z.object({
@@ -145,6 +163,41 @@ export async function teachersRoutes(fastify: FastifyInstance) {
      });
 
      fastify.delete('/teacher/:id', async (request, reply) => {
+          try {
+               const teacherParams = z.object({
+                    id: z.string().uuid()
+               });
 
+               const { id } = teacherParams.parse(request.body);
+
+               const teacherExists = await prisma.teacher.findFirst({
+                    where: {
+                         id
+                    },
+               });
+
+               if (!teacherExists) return reply.status(400).send({
+                    status: 'error',
+                    message: 'Teacher not found.'
+               });
+
+               await prisma.teacher.delete({
+                    where: {
+                         id
+                    },
+               });
+
+               return reply.status(200).send({
+                    status: 'success',
+                    message: 'Teacher deleted with success.'
+               });
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
      });
 };
