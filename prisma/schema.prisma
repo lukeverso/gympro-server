@@ -14,7 +14,7 @@ datasource db {
      url      = env("DATABASE_URL")
 }
 
-model Student {
+model Students {
      id        String  @id @default(uuid())
      name      String
      username  String  @unique
@@ -30,14 +30,14 @@ model Student {
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 
-     address  Address?  @relation(fields: [addressId], references: [id], onDelete: Cascade)
-     teacher  Teacher?  @relation(fields: [teacherId], references: [id])
-     measures Measures? @relation(fields: [measuresId], references: [id], onDelete: Cascade)
+     address  Addresses? @relation(fields: [addressId], references: [id], onDelete: Cascade)
+     teacher  Teachers?  @relation(fields: [teacherId], references: [id])
+     measures Measures?  @relation(fields: [measuresId], references: [id], onDelete: Cascade)
 
-     exercises Exercise[]
+     exercises Workouts[]
 }
 
-model Teacher {
+model Teachers {
      id        String  @id @default(uuid())
      name      String
      username  String  @unique
@@ -49,10 +49,10 @@ model Teacher {
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 
-     students Student[]
+     students Students[]
 }
 
-model Address {
+model Addresses {
      id         String  @id @default(uuid())
      studentId  String  @unique
      street     String
@@ -65,7 +65,7 @@ model Address {
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 
-     student Student[]
+     student Students[]
 }
 
 model Measures {
@@ -84,33 +84,39 @@ model Measures {
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 
-     student Student[]
+     student Students[]
 }
 
-model Exercise {
+model Workouts {
      id          String  @id @default(uuid())
-     studentId   String  @unique
-     objective   String
-     startDate   String
-     endDate     String
      annotations String?
+     endDate     String
+     objective   String
+     type        String
+     focus     String
+     startDate   String
+     studentId   String  @unique
      active      Boolean
 
-     exercises ExerciseItem[]
+     exercises Exercises[]
 
-     student Student @relation(fields: [studentId], references: [id])
+     student Students @relation(fields: [studentId], references: [id])
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 }
 
-model ExerciseItem {
-     id         String @id @default(uuid())
-     exerciseId String
-     type       String
-     list       String
+model Exercises {
+     id          String  @id @default(uuid())
+     exerciseId  String  @unique
+     name        String
+     series      Int
+     repetitions Int
+     restTime    Int
+     annotations String?
+     finished    Boolean
 
-     exercise Exercise @relation(fields: [exerciseId], references: [id])
+     exercise Workouts @relation(fields: [exerciseId], references: [id])
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt

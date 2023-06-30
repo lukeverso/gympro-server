@@ -8,7 +8,7 @@ const salt = 10;
 
 export async function teachersRoutes(fastify: FastifyInstance) {
      fastify.get('/teachers', async (request, reply) => {
-          const teachers = await prisma.teacher.findMany({
+          const teachers = await prisma.teachers.findMany({
                select: {
                     id: true,
                     name: true,
@@ -39,7 +39,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
 
           const { id } = teacherParams.parse(request.params);
 
-          const teacher = await prisma.teacher.findUnique({
+          const teacher = await prisma.teachers.findUnique({
                where: {
                     id
                }
@@ -61,7 +61,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
 
                const teacherData = teacherBody.parse(request.body);
 
-               const teacherExists = await prisma.teacher.findFirst({
+               const teacherExists = await prisma.teachers.findFirst({
                     where: {
                          OR: [
                               { username: teacherData.username },
@@ -77,7 +77,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
 
                const hashedPassword = await bcrypt.hash(teacherData.password, salt);
 
-               await prisma.teacher.create({
+               await prisma.teachers.create({
                     data: {
                          name: teacherData.name,
                          username: teacherData.username,
@@ -110,7 +110,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
 
                const { id } = teachersParams.parse(request.params);
 
-               const teacherExists = await prisma.teacher.findFirst({
+               const teacherExists = await prisma.teachers.findFirst({
                     where: {
                          id
                     }
@@ -134,7 +134,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
 
                const hashedPassword = await bcrypt.hash(teacherData.password, salt);
 
-               await prisma.teacher.update({
+               await prisma.teachers.update({
                     where: {
                          id
                     },
@@ -170,7 +170,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
 
                const { id } = teacherParams.parse(request.body);
 
-               const teacherExists = await prisma.teacher.findFirst({
+               const teacherExists = await prisma.teachers.findFirst({
                     where: {
                          id
                     },
@@ -181,7 +181,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
                     message: 'Teacher not found.'
                });
 
-               await prisma.teacher.delete({
+               await prisma.teachers.delete({
                     where: {
                          id
                     },

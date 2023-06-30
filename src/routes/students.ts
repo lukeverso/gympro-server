@@ -7,10 +7,29 @@ import bcrypt from 'bcrypt';
 const salt = 10;
 
 export async function studentsRoutes(fastify: FastifyInstance) {
+     fastify.get('/students/verify-email', async (request, reply) => {
+          const verifyMailBody = z.object({
+               email: z.string()
+          });
+
+          const { email } = verifyMailBody.parse(request.body);
+
+          const userExists = await prisma.students.findUnique({
+               where: {
+                    email
+               }
+          });
+
+          if (userExists) return reply.status(400).send({
+               status: 'error',
+               message: 'E-mail already in use.'
+          });
+     });
+
      fastify.get('/students', {
           preHandler: authenticate
      }, async (request, reply) => {
-          const students = await prisma.student.findMany({
+          const students = await prisma.students.findMany({
                include: {
                     address: {
                          select: {
@@ -64,7 +83,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
           const { id } = studentParams.parse(request.params);
 
-          const student = await prisma.student.findUnique({
+          const student = await prisma.students.findUnique({
                where: {
                     id
                },
@@ -112,65 +131,6 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           return { student };
      });
 
-     fastify.post('/students', async (request, reply) => {
-          try {
-               const studentSchema = z.object({
-                    name: z.string(),
-                    username: z.string(),
-                    email: z.string().email(),
-                    password: z.string(),
-                    birthdate: z.string(),
-                    telephone: z.string(),
-               });
-
-               const studentBody = studentSchema.parse(request.body);
-
-               const studentExists = await prisma.student.findFirst({
-                    where: {
-                         OR: [
-                              {
-                                   username: studentBody.username
-                              },
-                              {
-                                   email: studentBody.email
-                              },
-                         ],
-                    },
-               });
-
-               if (studentExists) return reply.status(400).send({
-                    status: 'error',
-                    message: 'Student already exists.'
-               });
-
-               const hashedPassword = await bcrypt.hash(studentBody.password, salt);
-
-               const student = await prisma.student.create({
-                    data: {
-                         name: studentBody.name,
-                         username: studentBody.username,
-                         email: studentBody.email,
-                         password: hashedPassword,
-                         birthdate: studentBody.birthdate,
-                         telephone: studentBody.telephone
-                    }
-               });
-
-               return reply.status(201).send({
-                    status: 'success',
-                    message: 'Aluno criado com sucesso',
-                    student
-               });
-          } catch (error) {
-               console.log(error);
-
-               return reply.status(500).send({
-                    status: 'error',
-                    message: `Ocorreu um erro: ${error}`
-               });
-          };
-     });
-
      fastify.put('/students/:id', {
           preHandler: authenticate
      }, async (request, reply) => {
@@ -181,7 +141,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                const { id } = studentParams.parse(request.params);
 
-               const studentExists = await prisma.student.findFirst({
+               const studentExists = await prisma.students.findFirst({
                     where: {
                          id
                     }
@@ -210,7 +170,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                const hashedPassword = await bcrypt.hash(studentBody.password, salt);
 
-               await prisma.student.update({
+               await prisma.students.update({
                     where: {
                          id
                     },
@@ -248,7 +208,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                const { id } = studentParams.parse(request.body);
 
-               const userExists = await prisma.student.findFirst({
+               const userExists = await prisma.students.findFirst({
                     where: {
                          id
                     },
@@ -259,7 +219,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                     message: 'User not found.'
                });
 
-               await prisma.student.delete({
+               await prisma.students.delete({
                     where: {
                          id
                     },

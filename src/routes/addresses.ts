@@ -7,7 +7,7 @@ export async function addressesRoutes(fastify: FastifyInstance) {
      fastify.get('/addresses', {
           preHandler: authenticate
      }, async (request, reply) => {
-          const addresses = await prisma.address.findMany({
+          const addresses = await prisma.addresses.findMany({
                select: {
                     city: true,
                     code: true,
@@ -43,7 +43,7 @@ export async function addressesRoutes(fastify: FastifyInstance) {
 
                const addressesBody = addressesSchema.parse(request.body);
 
-               await prisma.address.create({
+               await prisma.addresses.create({
                     data: {
                          studentId: addressesBody.studentId,
                          street: addressesBody.street,

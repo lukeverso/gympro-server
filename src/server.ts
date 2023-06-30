@@ -3,7 +3,6 @@ import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 
 import { authenticationRoutes } from './routes/authentication';
-
 import { addressesRoutes } from './routes/addresses';
 import { exercisesRoutes } from './routes/exercises';
 import { measuresRoutes } from './routes/measures';
@@ -21,7 +20,6 @@ fastify.register(jwt, {
 });
 
 fastify.register(authenticationRoutes);
-
 fastify.register(addressesRoutes);
 fastify.register(exercisesRoutes);
 fastify.register(measuresRoutes);
