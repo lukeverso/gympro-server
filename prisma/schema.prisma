@@ -22,6 +22,7 @@ model Students {
      password  String
      birthdate String
      telephone String?
+     status    Boolean
 
      addressId  String?
      teacherId  String?
@@ -93,7 +94,7 @@ model Workouts {
      endDate     String
      objective   String
      type        String
-     focus     String
+     focus       String
      startDate   String
      studentId   String  @unique
      active      Boolean
