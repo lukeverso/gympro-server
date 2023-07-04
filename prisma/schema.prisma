@@ -46,7 +46,7 @@ model Teachers {
      password  String
      birthdate String
      telephone String?
-     gymId    String?
+     gymId     String?
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
@@ -69,7 +69,23 @@ model Gym {
      city       String
      country    String
 
-     teacher Teachers[]
+     createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
+
+     teachers      Teachers[]
+     notifications Notification[]
+}
+
+model Notification {
+     id      String @id @default(uuid())
+     title   String
+     content String
+
+     createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
+
+     Gym   Gym?    @relation(fields: [gymId], references: [id])
+     gymId String?
 }
 
 model Addresses {
@@ -82,9 +98,6 @@ model Addresses {
      city       String
      country    String
 
-     createdAt DateTime @default(now())
-     updatedAt DateTime @updatedAt
-
      student Students[]
 }
 
@@ -94,15 +107,14 @@ model Measures {
      height    String?
      weight    String?
      bmi       String?
+     chest     String?
      wingspan  String?
      waist     String?
      hip       String?
      arm       String?
      thigh     String?
+     calf      String?
      bodyFat   String?
-
-     createdAt DateTime @default(now())
-     updatedAt DateTime @updatedAt
 
      student Students[]
 }
@@ -121,9 +133,6 @@ model Workouts {
      exercises Exercises[]
 
      student Students @relation(fields: [studentId], references: [id])
-
-     createdAt DateTime @default(now())
-     updatedAt DateTime @updatedAt
 }
 
 model Exercises {
@@ -137,7 +146,4 @@ model Exercises {
      finished    Boolean
 
      exercise Workouts @relation(fields: [exerciseId], references: [id])
-
-     createdAt DateTime @default(now())
-     updatedAt DateTime @updatedAt
 }
