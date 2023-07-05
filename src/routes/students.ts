@@ -7,6 +7,7 @@ import bcrypt from 'bcrypt';
 const salt = 10;
 
 export async function studentsRoutes(fastify: FastifyInstance) {
+     // Verify if an email has been taken by a student
      fastify.get('/students/verify-email', async (request, reply) => {
           const verifyMailBody = z.object({
                email: z.string()
@@ -24,8 +25,11 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                status: 'error',
                message: 'E-mail already in use.'
           });
+
+          return reply.status(200).send({ ok: true });
      });
 
+     // Get a list of the students
      fastify.get('/students', {
           preHandler: authenticate
      }, async (request, reply) => {
@@ -74,6 +78,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           return { students };
      });
 
+     // Get a specific student
      fastify.get('/students/:id', {
           preHandler: authenticate
      }, async (request, reply) => {
@@ -131,6 +136,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           return { student };
      });
 
+     // Edit a student
      fastify.put('/students/:id', {
           preHandler: authenticate
      }, async (request, reply) => {
@@ -198,6 +204,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           };
      });
 
+     // Delete a student
      fastify.delete('/students/:id', {
           preHandler: authenticate
      }, async (request, reply) => {

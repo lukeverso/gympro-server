@@ -48,60 +48,6 @@ export async function teachersRoutes(fastify: FastifyInstance) {
           return { teacher };
      });
 
-     fastify.post('/teachers', async (request, reply) => {
-          try {
-               const teacherBody = z.object({
-                    name: z.string(),
-                    username: z.string(),
-                    email: z.string().email().nullable(),
-                    password: z.string(),
-                    birthdate: z.string(),
-                    telephone: z.string()
-               });
-
-               const teacherData = teacherBody.parse(request.body);
-
-               const teacherExists = await prisma.teachers.findFirst({
-                    where: {
-                         OR: [
-                              { username: teacherData.username },
-                              { email: teacherData.email },
-                         ],
-                    },
-               });
-
-               if (teacherExists) return reply.status(400).send({
-                    status: 'error',
-                    message: 'A teacher with the provided e-mail or username already exists.'
-               });
-
-               const hashedPassword = await bcrypt.hash(teacherData.password, salt);
-
-               await prisma.teachers.create({
-                    data: {
-                         name: teacherData.name,
-                         username: teacherData.username,
-                         email: teacherData.email,
-                         birthdate: teacherData.birthdate,
-                         telephone: teacherData.telephone,
-                         password: hashedPassword
-                    },
-               });
-
-               return reply.status(201).send({
-                    status: 'success',
-                    message: 'Teacher created successfully!'
-               });
-          } catch (error) {
-               console.log(error);
-
-               return reply.status(500).send({
-                    status: 'error',
-                    message: `Ocorreu um erro: ${error}`
-               });
-          }
-     });
-
      fastify.put('/teachers/:id', async (request, reply) => {
           try {
                const teachersParams = z.object({

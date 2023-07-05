@@ -4,36 +4,16 @@ import { z } from 'zod';
 import { authenticate } from '../plugins/authenticate';
 
 export async function measuresRoutes(fastify: FastifyInstance) {
-     fastify.get('/measures', {
-          preHandler: authenticate
-     }, async (request, reply) => {
-          const measures = await prisma.measures.findMany({
-               select: {
-                    arm: true,
-                    bmi: true,
-                    bodyFat: true,
-                    height: true,
-                    hip: true,
-                    thigh: true,
-                    waist: true,
-                    weight: true,
-                    wingspan: true,
-                    student: {
-                         select: {
-                              name: true,
-                              username: true
-                         }
-                    }
-               }
-          });
-
-          return { measures };
-     });
-
-     fastify.post('/measures', async (request, reply) => {
+     // Store a student's measures
+     fastify.post('/measures/:id', async (request, reply) => {
           try {
+               const measuresParams = z.object({
+                    id: z.string().uuid()
+               });
+
+               const { id } = measuresParams.parse(request.params);
+
                const measureBody = z.object({
-                    studentId: z.string().uuid(),
                     height: z.string(),
                     weight: z.string(),
                     bmi: z.string(),
@@ -42,23 +22,36 @@ export async function measuresRoutes(fastify: FastifyInstance) {
                     hip: z.string(),
                     arm: z.string(),
                     thigh: z.string(),
+                    calf: z.string(),
                     bodyFat: z.string()
                });
 
-               const measureData = measureBody.parse(request.body);
+               const {
+                    height,
+                    weight,
+                    bmi,
+                    wingspan,
+                    waist,
+                    hip,
+                    arm,
+                    thigh,
+                    calf,
+                    bodyFat,
+               } = measureBody.parse(request.body);
 
                await prisma.measures.create({
                     data: {
-                         studentId: measureData.studentId,
-                         height: measureData.height,
-                         weight: measureData.weight,
-                         bmi: measureData.bmi,
-                         wingspan: measureData.wingspan,
-                         waist: measureData.waist,
-                         hip: measureData.hip,
-                         arm: measureData.arm,
-                         thigh: measureData.thigh,
-                         bodyFat: measureData.bodyFat,
+                         studentId: id,
+                         height: height,
+                         weight: weight,
+                         bmi: bmi,
+                         wingspan: wingspan,
+                         waist: waist,
+                         hip: hip,
+                         arm: arm,
+                         thigh: thigh,
+                         calf: calf,
+                         bodyFat: bodyFat,
                     },
                });
 
@@ -76,6 +69,7 @@ export async function measuresRoutes(fastify: FastifyInstance) {
           };
      });
 
+     // Edit a student's measures
      fastify.put('/measures/:id', async (request, reply) => {
           try {
                const measureParams = z.object({
@@ -93,25 +87,38 @@ export async function measuresRoutes(fastify: FastifyInstance) {
                     hip: z.string(),
                     arm: z.string(),
                     thigh: z.string(),
+                    calf: z.string(),
                     bodyFat: z.string()
                });
 
-               const measureData = measureBody.parse(request.body);
+               const {
+                    height,
+                    weight,
+                    bmi,
+                    wingspan,
+                    waist,
+                    hip,
+                    arm,
+                    thigh,
+                    calf,
+                    bodyFat,
+               } = measureBody.parse(request.body);
 
                await prisma.measures.update({
                     where: {
                          id
                     },
                     data: {
-                         height: measureData.height,
-                         weight: measureData.weight,
-                         bmi: measureData.bmi,
-                         wingspan: measureData.wingspan,
-                         waist: measureData.waist,
-                         hip: measureData.hip,
-                         arm: measureData.arm,
-                         thigh: measureData.thigh,
-                         bodyFat: measureData.bodyFat,
+                         height,
+                         weight,
+                         bmi,
+                         wingspan,
+                         waist,
+                         hip,
+                         arm,
+                         thigh,
+                         calf,
+                         bodyFat,
                     }
                });
 

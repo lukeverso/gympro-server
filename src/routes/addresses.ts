@@ -4,10 +4,19 @@ import { z } from 'zod';
 import { authenticate } from '../plugins/authenticate';
 
 export async function addressesRoutes(fastify: FastifyInstance) {
-     fastify.get('/addresses', {
+     fastify.get('/addresses/:id', {
           preHandler: authenticate
      }, async (request, reply) => {
-          const addresses = await prisma.addresses.findMany({
+          const param = z.object({
+               id: z.string().uuid()
+          });
+
+          const { id } = param.parse(request.params);
+
+          const addresses = await prisma.addresses.findUnique({
+               where: {
+                    id
+               },
                select: {
                     city: true,
                     code: true,
@@ -25,48 +34,6 @@ export async function addressesRoutes(fastify: FastifyInstance) {
           });
 
           return { addresses };
-     });
-
-     fastify.post('/addresses', {
-          preHandler: authenticate
-     }, async (request, reply) => {
-          try {
-               const addressesSchema = z.object({
-                    studentId: z.string().uuid(),
-                    street: z.string(),
-                    number: z.string(),
-                    complement: z.string(),
-                    code: z.string(),
-                    city: z.string(),
-                    country: z.string()
-               });
-
-               const addressesBody = addressesSchema.parse(request.body);
-
-               await prisma.addresses.create({
-                    data: {
-                         studentId: addressesBody.studentId,
-                         street: addressesBody.street,
-                         number: addressesBody.number,
-                         complement: addressesBody.complement,
-                         code: addressesBody.code,
-                         city: addressesBody.city,
-                         country: addressesBody.country
-                    }
-               });
-
-               return reply.status(201).send({
-                    status: 'success',
-                    message: 'Endereço criado com sucesso!'
-               });
-          } catch (error) {
-               console.log(error);
-
-               return reply.status(500).send({
-                    status: 'error',
-                    message: `Ocorreu um erro: ${error}`
-               });
-          };
      });
 
      fastify.put('/addresses/:id', {
