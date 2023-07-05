@@ -24,16 +24,21 @@ model Students {
      telephone String?
      status    Boolean
 
+     street     String
+     number     String
+     complement String?
+     code       String
+     city       String
+     country    String
+
      addressId  String?
      teacherId  String?
      measuresId String?
 
      createdAt DateTime @default(now())
-     updatedAt DateTime @updatedAt
 
-     address  Addresses? @relation(fields: [addressId], references: [id], onDelete: Cascade)
-     teacher  Teachers?  @relation(fields: [teacherId], references: [id])
-     measures Measures?  @relation(fields: [measuresId], references: [id], onDelete: Cascade)
+     teacher  Teachers? @relation(fields: [teacherId], references: [id])
+     measures Measures? @relation(fields: [measuresId], references: [id], onDelete: Cascade)
 
      exercises Workouts[]
 }
@@ -46,13 +51,22 @@ model Teachers {
      password  String
      birthdate String
      telephone String?
-     gymId     String?
+     status    Boolean
+
+     street     String
+     number     String
+     complement String?
+     code       String
+     city       String
+     country    String
+
+     gymId String?
 
      createdAt DateTime @default(now())
-     updatedAt DateTime @updatedAt
+
+     Gym Gym? @relation(fields: [gymId], references: [id])
 
      students Students[]
-     Gym      Gym?       @relation(fields: [gymId], references: [id])
 }
 
 model Gym {
@@ -70,51 +84,38 @@ model Gym {
      country    String
 
      createdAt DateTime @default(now())
-     updatedAt DateTime @updatedAt
 
      teachers      Teachers[]
      notifications Notification[]
 }
 
 model Notification {
-     id      String @id @default(uuid())
+     id    String  @id @default(uuid())
+     gymId String?
+
      title   String
      content String
 
      createdAt DateTime @default(now())
-     updatedAt DateTime @updatedAt
 
-     Gym   Gym?    @relation(fields: [gymId], references: [id])
-     gymId String?
-}
-
-model Addresses {
-     id         String  @id @default(uuid())
-     studentId  String  @unique
-     street     String
-     number     String
-     complement String?
-     code       String
-     city       String
-     country    String
-
-     student Students[]
+     Gym Gym? @relation(fields: [gymId], references: [id])
 }
 
 model Measures {
-     id        String  @id @default(uuid())
-     studentId String  @unique
-     height    String?
-     weight    String?
-     bmi       String?
-     chest     String?
-     wingspan  String?
-     waist     String?
-     hip       String?
-     arm       String?
-     thigh     String?
-     calf      String?
-     bodyFat   String?
+     id        String @id @default(uuid())
+     studentId String @unique
+
+     height   String?
+     weight   String?
+     bmi      String?
+     chest    String?
+     wingspan String?
+     waist    String?
+     hip      String?
+     arm      String?
+     thigh    String?
+     calf     String?
+     bodyFat  String?
 
      student Students[]
 }
