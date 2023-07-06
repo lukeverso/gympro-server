@@ -18,7 +18,7 @@ model Students {
      id        String  @id @default(uuid())
      name      String
      username  String  @unique
-     email     String? @unique
+     email     String  @unique
      password  String
      birthdate String
      telephone String?
@@ -36,6 +36,7 @@ model Students {
      measuresId String?
 
      createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
 
      teacher  Teachers? @relation(fields: [teacherId], references: [id])
      measures Measures? @relation(fields: [measuresId], references: [id], onDelete: Cascade)
@@ -47,7 +48,7 @@ model Teachers {
      id        String  @id @default(uuid())
      name      String
      username  String  @unique
-     email     String? @unique
+     email     String  @unique
      password  String
      birthdate String
      telephone String?
@@ -60,9 +61,10 @@ model Teachers {
      city       String
      country    String
 
-     gymId String?
-
      createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
+
+     gymId String?
 
      Gym Gym? @relation(fields: [gymId], references: [id])
 
@@ -84,6 +86,7 @@ model Gym {
      country    String
 
      createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
 
      teachers      Teachers[]
      notifications Notification[]
@@ -97,6 +100,7 @@ model Notification {
      content String
 
      createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
 
      Gym Gym? @relation(fields: [gymId], references: [id])
 }
@@ -117,19 +121,25 @@ model Measures {
      calf     String?
      bodyFat  String?
 
+     createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
+
      student Students[]
 }
 
 model Workouts {
      id          String  @id @default(uuid())
+     studentId   String  @unique
      annotations String?
      endDate     String
      objective   String
      type        String
      focus       String
      startDate   String
-     studentId   String  @unique
      active      Boolean
+
+     createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
 
      exercises Exercises[]
 
@@ -143,8 +153,12 @@ model Exercises {
      series      Int
      repetitions Int
      restTime    Int
+     weight      String?
      annotations String?
      finished    Boolean
+
+     createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
 
      exercise Workouts @relation(fields: [exerciseId], references: [id])
 }

@@ -9,7 +9,7 @@ export async function authenticationRoutes(fastify: FastifyInstance) {
      // Create a student
      fastify.post('/students', async (request, reply) => {
           try {
-               const studentSchema = z.object({
+               const body = z.object({
                     name: z.string(),
                     username: z.string(),
                     email: z.string().email(),
@@ -24,16 +24,16 @@ export async function authenticationRoutes(fastify: FastifyInstance) {
                     country: z.string(),
                });
 
-               const studentBody = studentSchema.parse(request.body);
+               const student = body.parse(request.body);
 
                const studentExists = await prisma.students.findFirst({
                     where: {
                          OR: [
                               {
-                                   username: studentBody.username
+                                   username: student.username
                               },
                               {
-                                   email: studentBody.email
+                                   email: student.email
                               },
                          ],
                     },
@@ -44,35 +44,31 @@ export async function authenticationRoutes(fastify: FastifyInstance) {
                     message: 'Student already exists.'
                });
 
-               const hashedPassword = await bcrypt.hash(studentBody.password, salt);
+               const hashedPassword = await bcrypt.hash(student.password, salt);
 
-               const student = await prisma.students.create({
+               const create = await prisma.students.create({
                     data: {
-                         name: studentBody.name,
-                         username: studentBody.username,
-                         email: studentBody.email,
+                         name: student.name,
+                         username: student.username,
+                         email: student.email,
                          password: hashedPassword,
-                         birthdate: studentBody.birthdate,
-                         telephone: studentBody.telephone,
+                         birthdate: student.birthdate,
+                         telephone: student.telephone,
                          status: true,
-                         address: {
-                              create: {
-                                   street: studentBody.street,
-                                   number: studentBody.number,
-                                   complement: studentBody.complement,
-                                   code: studentBody.code,
-                                   city: studentBody.city,
-                                   country: studentBody.country
-                              }
-                         }
+                         street: student.street,
+                         number: student.number,
+                         complement: student.complement,
+                         code: student.code,
+                         city: student.city,
+                         country: student.country,
                     }
                });
 
                const token = fastify.jwt.sign({
-                    email: student.email,
-                    username: student.username
+                    email: create.email,
+                    username: create.username
                }, {
-                    sub: student.id,
+                    sub: create.id,
                     expiresIn: '7 days'
                });
 
@@ -80,9 +76,9 @@ export async function authenticationRoutes(fastify: FastifyInstance) {
                     status: 'success',
                     message: 'Aluno criado com sucesso',
                     student: {
-                         id: student.id,
-                         name: student.name,
-                         email: student.email
+                         id: create.id,
+                         name: create.name,
+                         email: create.email
                     },
                     token
                });
@@ -96,10 +92,10 @@ export async function authenticationRoutes(fastify: FastifyInstance) {
           };
      });
 
-     // Create a student
+     // Create a teacher
      fastify.post('/teachers', async (request, reply) => {
           try {
-               const teacherSchema = z.object({
+               const body = z.object({
                     name: z.string(),
                     username: z.string(),
                     email: z.string().email(),
@@ -114,16 +110,16 @@ export async function authenticationRoutes(fastify: FastifyInstance) {
                     country: z.string(),
                });
 
-               const teacherBody = teacherSchema.parse(request.body);
+               const teacher = body.parse(request.body);
 
                const teacherExists = await prisma.teachers.findFirst({
                     where: {
                          OR: [
                               {
-                                   username: teacherBody.username
+                                   username: teacher.username
                               },
                               {
-                                   email: teacherBody.email
+                                   email: teacher.email
                               },
                          ],
                     },
@@ -134,45 +130,41 @@ export async function authenticationRoutes(fastify: FastifyInstance) {
                     message: 'Teacher already exists.'
                });
 
-               const hashedPassword = await bcrypt.hash(teacherBody.password, salt);
+               const hashedPassword = await bcrypt.hash(teacher.password, salt);
 
-               const teacher = await prisma.teachers.create({
+               const create = await prisma.teachers.create({
                     data: {
-                         name: teacherBody.name,
-                         username: teacherBody.username,
-                         email: teacherBody.email,
+                         name: teacher.name,
+                         username: teacher.username,
+                         email: teacher.email,
                          password: hashedPassword,
-                         birthdate: teacherBody.birthdate,
-                         telephone: teacherBody.telephone,
+                         birthdate: teacher.birthdate,
+                         telephone: teacher.telephone,
                          status: true,
-                         address: {
-                              create: {
-                                   street: teacherBody.street,
-                                   number: teacherBody.number,
-                                   complement: teacherBody.complement,
-                                   code: teacherBody.code,
-                                   city: teacherBody.city,
-                                   country: teacherBody.country
-                              }
-                         }
+                         street: teacher.street,
+                         number: teacher.number,
+                         complement: teacher.complement,
+                         code: teacher.code,
+                         city: teacher.city,
+                         country: teacher.country
                     }
                });
 
                const token = fastify.jwt.sign({
-                    email: teacher.email,
-                    username: teacher.username
+                    email: create.email,
+                    username: create.username
                }, {
-                    sub: teacher.id,
+                    sub: create.id,
                     expiresIn: '7 days'
                });
 
                return reply.status(201).send({
                     status: 'success',
-                    message: 'Aluno criado com sucesso',
+                    message: 'Personal criado com sucesso',
                     teacher: {
-                         id: teacher.id,
-                         name: teacher.name,
-                         email: teacher.email
+                         id: create.id,
+                         name: create.name,
+                         email: create.email
                     },
                     token
                });

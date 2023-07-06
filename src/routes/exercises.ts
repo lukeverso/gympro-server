@@ -4,18 +4,19 @@ import { z } from 'zod';
 import { authenticate } from '../plugins/authenticate';
 
 export async function exercisesRoutes(fastify: FastifyInstance) {
+     // Get a student's exercises
      fastify.get('/exercises/:id', {
           preHandler: authenticate
      }, async (request, reply) => {
-          const exercisesParams = z.object({
+          const params = z.object({
                id: z.string().uuid()
           });
 
-          const { id } = exercisesParams.parse(request.params);
+          const { id } = params.parse(request.params);
 
           const exercises = await prisma.workouts.findUnique({
                where: {
-                    studentId: id
+                    id
                },
                select: {
                     active: true,
@@ -37,7 +38,8 @@ export async function exercisesRoutes(fastify: FastifyInstance) {
                               name: true,
                               repetitions: true,
                               restTime: true,
-                              series: true
+                              series: true,
+                              weight: true
                          },
                     },
                },
@@ -46,17 +48,23 @@ export async function exercisesRoutes(fastify: FastifyInstance) {
           return { exercises };
      });
 
-     fastify.post('/exercises', {
+     // Create an exercise for a student
+     fastify.post('/exercises/:id', {
           preHandler: authenticate
      }, async (request, reply) => {
-          const exercisesBody = z.object({
+          const params = z.object({
+               id: z.string().uuid()
+          });
+
+          const { id } = params.parse(request.params);
+
+          const body = z.object({
                active: z.boolean(),
                objective: z.string(),
                type: z.string(),
                focus: z.string(),
                startDate: z.string(),
-               endDate: z.string(),
-               studentId: z.string().uuid(),
+               endDate: z.string()
           });
 
           const {
@@ -65,9 +73,8 @@ export async function exercisesRoutes(fastify: FastifyInstance) {
                type,
                focus,
                startDate,
-               endDate,
-               studentId,
-          } = exercisesBody.parse(request.body);
+               endDate
+          } = body.parse(request.body);
 
           await prisma.workouts.create({
                data: {
@@ -77,7 +84,11 @@ export async function exercisesRoutes(fastify: FastifyInstance) {
                     focus,
                     startDate,
                     endDate,
-                    studentId,
+                    student: {
+                         connect: {
+                              id
+                         }
+                    }
                }
           });
 

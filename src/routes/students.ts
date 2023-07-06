@@ -9,71 +9,46 @@ const salt = 10;
 export async function studentsRoutes(fastify: FastifyInstance) {
      // Verify if an email has been taken by a student
      fastify.get('/students/verify-email', async (request, reply) => {
-          const verifyMailBody = z.object({
-               email: z.string()
-          });
+          try {
+               const querySchema = z.object({
+                    email: z.string()
+               });
 
-          const { email } = verifyMailBody.parse(request.body);
+               const { email } = querySchema.parse(request.query);
 
-          const userExists = await prisma.students.findUnique({
-               where: {
-                    email
-               }
-          });
+               const userExists = await prisma.students.findUnique({
+                    where: {
+                         email
+                    }
+               });
 
-          if (userExists) return reply.status(400).send({
-               status: 'error',
-               message: 'E-mail already in use.'
-          });
+               console.log(userExists);
 
-          return reply.status(200).send({ ok: true });
+               if (userExists) {
+                    return reply.status(400).send({
+                         status: 'error',
+                         message: 'Este e-mail está em uso.'
+                    });
+               };
+
+               return reply.status(200).send({
+                    status: 'success',
+                    message: 'E-mail não utilizado.'
+               });
+          } catch (error) {
+               console.error(error);
+               return reply.status(500).send({
+                    status: 'error',
+                    message: 'Erro interno do servidor.'
+               });
+          }
      });
 
      // Get a list of the students
      fastify.get('/students', {
           preHandler: authenticate
      }, async (request, reply) => {
-          const students = await prisma.students.findMany({
-               include: {
-                    address: {
-                         select: {
-                              city: true,
-                              code: true,
-                              complement: true,
-                              country: true,
-                              number: true,
-                              street: true,
-                         },
-                    },
-                    exercises: {
-                         select: {
-                              active: true,
-                              objective: true,
-                              exercises: true
-                         },
-                    },
-                    measures: {
-                         select: {
-                              arm: true,
-                              bmi: true,
-                              bodyFat: true,
-                              height: true,
-                              hip: true,
-                              thigh: true,
-                              waist: true,
-                              weight: true,
-                              wingspan: true
-                         },
-                    },
-                    teacher: {
-                         select: {
-                              name: true,
-                              username: true,
-                              email: true
-                         },
-                    }
-               }
-          });
+          const students = await prisma.students.findMany();
 
           return { students };
      });
@@ -82,54 +57,22 @@ export async function studentsRoutes(fastify: FastifyInstance) {
      fastify.get('/students/:id', {
           preHandler: authenticate
      }, async (request, reply) => {
-          const studentParams = z.object({
+          const params = z.object({
                id: z.string().uuid()
           });
 
-          const { id } = studentParams.parse(request.params);
+          const { id } = params.parse(request.params);
 
           const student = await prisma.students.findUnique({
                where: {
                     id
                },
-               include: {
-                    address: {
-                         select: {
-                              city: true,
-                              code: true,
-                              complement: true,
-                              country: true,
-                              number: true,
-                              street: true,
-                         },
-                    },
-                    exercises: {
-                         select: {
-                              active: true,
-                              objective: true,
-                              exercises: true
-                         },
-                    },
-                    measures: {
-                         select: {
-                              arm: true,
-                              bmi: true,
-                              bodyFat: true,
-                              height: true,
-                              hip: true,
-                              thigh: true,
-                              waist: true,
-                              weight: true,
-                              wingspan: true
-                         },
-                    },
-                    teacher: {
-                         select: {
-                              name: true,
-                              username: true,
-                              email: true
-                         },
-                    }
+               select: {
+                    name: true,
+                    username: true,
+                    email: true,
+                    birthdate: true,
+                    telephone: true
                }
           });
 
@@ -141,11 +84,11 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
-               const studentParams = z.object({
+               const params = z.object({
                     id: z.string().uuid()
                });
 
-               const { id } = studentParams.parse(request.params);
+               const { id } = params.parse(request.params);
 
                const studentExists = await prisma.students.findFirst({
                     where: {
@@ -163,29 +106,29 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                     message: "You cannot update another user's data."
                });
 
-               const studentSchema = z.object({
+               const body = z.object({
                     name: z.string(),
                     username: z.string(),
-                    email: z.string().email().nullable(),
+                    email: z.string().email(),
                     password: z.string(),
                     birthdate: z.string(),
                     telephone: z.string()
                });
 
-               const studentBody = studentSchema.parse(request.body);
+               const student = body.parse(request.body);
 
-               const hashedPassword = await bcrypt.hash(studentBody.password, salt);
+               const hashedPassword = await bcrypt.hash(student.password, salt);
 
                await prisma.students.update({
                     where: {
                          id
                     },
                     data: {
-                         name: studentBody.name,
-                         username: studentBody.username,
-                         email: studentBody.email,
-                         birthdate: studentBody.birthdate,
-                         telephone: studentBody.telephone,
+                         name: student.name,
+                         username: student.username,
+                         email: student.email,
+                         birthdate: student.birthdate,
+                         telephone: student.telephone,
                          password: hashedPassword
                     }
                });
@@ -209,11 +152,11 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
-               const studentParams = z.object({
+               const params = z.object({
                     id: z.string().uuid()
                });
 
-               const { id } = studentParams.parse(request.body);
+               const { id } = params.parse(request.body);
 
                const userExists = await prisma.students.findFirst({
                     where: {

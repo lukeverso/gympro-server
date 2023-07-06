@@ -7,13 +7,13 @@ export async function measuresRoutes(fastify: FastifyInstance) {
      // Store a student's measures
      fastify.post('/measures/:id', async (request, reply) => {
           try {
-               const measuresParams = z.object({
+               const params = z.object({
                     id: z.string().uuid()
                });
 
-               const { id } = measuresParams.parse(request.params);
+               const { id } = params.parse(request.params);
 
-               const measureBody = z.object({
+               const body = z.object({
                     height: z.string(),
                     weight: z.string(),
                     bmi: z.string(),
@@ -37,7 +37,7 @@ export async function measuresRoutes(fastify: FastifyInstance) {
                     thigh,
                     calf,
                     bodyFat,
-               } = measureBody.parse(request.body);
+               } = body.parse(request.body);
 
                await prisma.measures.create({
                     data: {
@@ -72,13 +72,13 @@ export async function measuresRoutes(fastify: FastifyInstance) {
      // Edit a student's measures
      fastify.put('/measures/:id', async (request, reply) => {
           try {
-               const measureParams = z.object({
+               const params = z.object({
                     id: z.string().uuid()
                });
 
-               const { id } = measureParams.parse(request.params);
+               const { id } = params.parse(request.params);
 
-               const measureBody = z.object({
+               const body = z.object({
                     height: z.string(),
                     weight: z.string(),
                     bmi: z.string(),
@@ -102,7 +102,7 @@ export async function measuresRoutes(fastify: FastifyInstance) {
                     thigh,
                     calf,
                     bodyFat,
-               } = measureBody.parse(request.body);
+               } = body.parse(request.body);
 
                await prisma.measures.update({
                     where: {
