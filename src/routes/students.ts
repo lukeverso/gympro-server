@@ -8,10 +8,10 @@ const salt = 10;
 
 export async function studentsRoutes(fastify: FastifyInstance) {
      // Verify if an email has been taken by a student
-     fastify.get('/students/verify-email', async (request, reply) => {
+     fastify.post('/students/verify-email', async (request, reply) => {
           try {
                const querySchema = z.object({
-                    email: z.string()
+                    email: z.string().email()
                });
 
                const { email } = querySchema.parse(request.query);
