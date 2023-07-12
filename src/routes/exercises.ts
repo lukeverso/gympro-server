@@ -27,7 +27,6 @@ export async function exercisesRoutes(fastify: FastifyInstance) {
                     student: {
                          select: {
                               name: true,
-                              username: true
                          },
                     },
                     exercises: {

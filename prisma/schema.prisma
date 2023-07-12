@@ -30,12 +30,14 @@ model Students {
      country    String
 
      teacherId  String?
+     gymId      String?
      measuresId String?
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 
      teacher  Teachers? @relation(fields: [teacherId], references: [id])
+     gym      Gyms?      @relation(fields: [gymId], references: [id])
      measures Measures? @relation(fields: [measuresId], references: [id], onDelete: Cascade)
 
      exercises Workouts[]
@@ -61,15 +63,14 @@ model Teachers {
 
      gymId String?
 
-     Gym Gym? @relation(fields: [gymId], references: [id])
+     gym Gyms? @relation(fields: [gymId], references: [id])
 
      students Students[]
 }
 
-model Gym {
+model Gyms {
      id       String @id @default(uuid())
      name     String
-     username String @unique
      email    String @unique
      password String
 
@@ -84,20 +85,22 @@ model Gym {
      updatedAt DateTime @updatedAt
 
      teachers      Teachers[]
-     notifications Notification[]
+     notifications Notifications[]
+     students      Students[]
 }
 
-model Notification {
+model Notifications {
      id    String  @id @default(uuid())
      gymId String?
 
-     title   String
-     content String
+     title    String
+     content  String
+     expanded Boolean @default(false)
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 
-     Gym Gym? @relation(fields: [gymId], references: [id])
+     gym Gyms? @relation(fields: [gymId], references: [id])
 }
 
 model Measures {

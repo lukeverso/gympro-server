@@ -7,6 +7,72 @@ import bcrypt from 'bcrypt';
 const salt = 10;
 
 export async function teachersRoutes(fastify: FastifyInstance) {
+     // Create a teacher
+     fastify.post('/teachers', async (request, reply) => {
+          try {
+               const body = z.object({
+                    name: z.string(),
+                    surname: z.string(),
+                    email: z.string().email(),
+                    password: z.string(),
+                    birthdate: z.string(),
+                    telephone: z.string(),
+                    street: z.string(),
+                    number: z.string(),
+                    complement: z.string().nullable(),
+                    city: z.string(),
+                    country: z.string(),
+               });
+
+               const teacher = body.parse(request.body);
+
+               const fullname = teacher.name + ' ' + teacher.surname;
+
+               const hashedPassword = await bcrypt.hash(teacher.password, salt);
+
+               const create = await prisma.teachers.create({
+                    data: {
+                         name: fullname,
+                         email: teacher.email,
+                         password: hashedPassword,
+                         birthdate: teacher.birthdate,
+                         telephone: teacher.telephone,
+                         status: true,
+                         street: teacher.street,
+                         number: teacher.number,
+                         complement: teacher.complement,
+                         city: teacher.city,
+                         country: teacher.country
+                    }
+               });
+
+               const token = fastify.jwt.sign({
+                    email: create.email,
+               }, {
+                    sub: create.id,
+                    expiresIn: '7 days'
+               });
+
+               return reply.status(201).send({
+                    status: 'success',
+                    message: 'Personal criado com sucesso',
+                    teacher: {
+                         id: create.id,
+                         name: create.name,
+                         email: create.email
+                    },
+                    token
+               });
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
+     });
+     
      // List all teachers
      fastify.get('/teachers', async (request, reply) => {
           const teachers = await prisma.teachers.findMany();
@@ -30,7 +96,6 @@ export async function teachersRoutes(fastify: FastifyInstance) {
                },
                select: {
                     name: true,
-                    username: true,
                     birthdate: true,
                     email: true,
                     telephone: true,
@@ -38,7 +103,6 @@ export async function teachersRoutes(fastify: FastifyInstance) {
                     students: {
                          select: {
                               name: true,
-                              username: true,
                               birthdate: true,
                               email: true,
                               telephone: true,
@@ -95,7 +159,6 @@ export async function teachersRoutes(fastify: FastifyInstance) {
                     },
                     data: {
                          name: teacher.name,
-                         username: teacher.username,
                          email: teacher.email,
                          birthdate: teacher.birthdate,
                          telephone: teacher.telephone,

@@ -16,16 +16,14 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                const { email } = querySchema.parse(request.query);
 
-               const userExists = await prisma.students.findUnique({
+               const user = await prisma.students.findUnique({
                     where: {
                          email
                     }
                });
 
-               console.log(userExists);
-
-               if (userExists) {
-                    return reply.status(400).send({
+               if (user?.email === email) {
+                    return reply.status(200).send({
                          status: 'error',
                          message: 'Este e-mail está em uso.'
                     });
@@ -42,6 +40,59 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                     message: 'Erro interno do servidor.'
                });
           }
+     });
+
+     // Create a student
+     fastify.post('/students', async (request, reply) => {
+          try {
+               const body = z.object({
+                    name: z.string(),
+                    surname: z.string(),
+                    email: z.string().email(),
+                    password: z.string(),
+                    birthdate: z.string(),
+                    telephone: z.string(),
+                    street: z.string(),
+                    number: z.string(),
+                    complement: z.string().nullable(),
+                    city: z.string(),
+                    country: z.string(),
+               });
+
+               const student = body.parse(request.body);
+
+               const fullname = student.name + ' ' + student.surname;
+
+               const hashedPassword = await bcrypt.hash(student.password, salt);
+
+               await prisma.students.create({
+                    data: {
+                         name: fullname,
+                         email: student.email,
+                         password: hashedPassword,
+                         birthdate: student.birthdate,
+                         telephone: student.telephone,
+                         status: true,
+                         street: student.street,
+                         number: student.number,
+                         complement: student.complement,
+                         city: student.city,
+                         country: student.country,
+                    }
+               });
+
+               return reply.status(201).send({
+                    status: 'success',
+                    message: 'Aluno criado com sucesso'
+               });
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
      });
 
      // Get a list of the students
@@ -69,7 +120,31 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                },
                select: {
                     name: true,
-                    username: true,
+                    email: true,
+                    birthdate: true,
+                    telephone: true
+               }
+          });
+
+          return { student };
+     });
+
+     // Get a specific student
+     fastify.get('/students/me/:id', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          const params = z.object({
+               id: z.string().uuid()
+          });
+
+          const { id } = params.parse(request.params);
+
+          const student = await prisma.students.findUnique({
+               where: {
+                    id
+               },
+               select: {
+                    name: true,
                     email: true,
                     birthdate: true,
                     telephone: true
@@ -125,7 +200,6 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                     },
                     data: {
                          name: student.name,
-                         username: student.username,
                          email: student.email,
                          birthdate: student.birthdate,
                          telephone: student.telephone,
