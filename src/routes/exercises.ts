@@ -20,31 +20,23 @@ export async function exercisesRoutes(fastify: FastifyInstance) {
                },
                select: {
                     active: true,
-                    annotations: true,
-                    endDate: true,
-                    objective: true,
-                    startDate: true,
-                    student: {
-                         select: {
-                              name: true,
-                         },
-                    },
+                    focus: true,
+                    type: true,
                     exercises: {
                          select: {
-                              annotations: true,
-                              exercise: true,
-                              finished: true,
+                              id: true,
                               name: true,
-                              repetitions: true,
-                              restTime: true,
+                              annotations: true,
                               series: true,
-                              weight: true
-                         },
-                    },
+                              repetitions: true,
+                              weight: true,
+                              restTime: true
+                         }
+                    }
                },
           });
 
-          return { exercises };
+          return reply.status(200).send({ exercises });
      });
 
      // Create an exercise for a student
@@ -74,22 +66,6 @@ export async function exercisesRoutes(fastify: FastifyInstance) {
                startDate,
                endDate
           } = body.parse(request.body);
-
-          await prisma.workouts.create({
-               data: {
-                    active,
-                    objective,
-                    type,
-                    focus,
-                    startDate,
-                    endDate,
-                    student: {
-                         connect: {
-                              id
-                         }
-                    }
-               }
-          });
 
           return reply.status(201).send({
                status: 'success',

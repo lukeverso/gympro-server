@@ -34,17 +34,14 @@ export async function authenticationRoutes(fastify: FastifyInstance) {
           });
 
           const token = fastify.jwt.sign({
-               id: studentExists.id,
-               email: studentExists.email
+               id: studentExists.id
           }, {
                sub: studentExists.id,
                expiresIn: '7 days'
           });
 
           const user = {
-               id: studentExists.id,
-               name: studentExists.name,
-               email: studentExists.email
+               id: studentExists.id
           };
 
           return reply.status(200).send({
@@ -82,13 +79,18 @@ export async function authenticationRoutes(fastify: FastifyInstance) {
           });
 
           const token = fastify.jwt.sign({
-               email: teacherExists.email,
+               id: teacherExists.id,
           }, {
                sub: teacherExists.id,
                expiresIn: '7 days'
           });
 
+          const teacher = {
+               id: teacherExists.id
+          };
+
           return reply.status(200).send({
+               teacher,
                token,
                message: 'Authenticated successfully.'
           });

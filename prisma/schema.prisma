@@ -23,11 +23,13 @@ model Students {
      telephone String?
      status    Boolean
 
+     code       String
      street     String
      number     String
      complement String?
+     district   String
      city       String
-     country    String
+     state      String
 
      teacherId  String?
      gymId      String?
@@ -37,10 +39,10 @@ model Students {
      updatedAt DateTime @updatedAt
 
      teacher  Teachers? @relation(fields: [teacherId], references: [id])
-     gym      Gyms?      @relation(fields: [gymId], references: [id])
+     gym      Gyms?     @relation(fields: [gymId], references: [id])
      measures Measures? @relation(fields: [measuresId], references: [id], onDelete: Cascade)
 
-     exercises Workouts[]
+     sheets Sheets[]
 }
 
 model Teachers {
@@ -52,11 +54,13 @@ model Teachers {
      telephone String?
      status    Boolean
 
+     code       String
      street     String
      number     String
      complement String?
+     district   String
      city       String
-     country    String
+     state      String
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
@@ -74,12 +78,13 @@ model Gyms {
      email    String @unique
      password String
 
+     code       String
      street     String
      number     String
      complement String?
-     code       String
+     district   String
      city       String
-     country    String
+     state      String
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
@@ -125,28 +130,40 @@ model Measures {
      student Students[]
 }
 
-model Workouts {
+model Sheets {
      id          String  @id @default(uuid())
-     studentId   String  @unique
+     studentsId  String  @unique
      annotations String?
-     endDate     String
      objective   String
-     type        String
-     focus       String
      startDate   String
+     endDate     String
      active      Boolean
+
+     createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
+
+     workouts Workouts[]
+     student  Students   @relation(fields: [studentsId], references: [id])
+}
+
+model Workouts {
+     id       String  @id @default(uuid())
+     sheetsId String?
+     type     String
+     focus    String
+     active   Boolean
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 
      exercises Exercises[]
 
-     student Students @relation(fields: [studentId], references: [id])
+     sheet Sheets? @relation(fields: [sheetsId], references: [id])
 }
 
 model Exercises {
      id          String  @id @default(uuid())
-     exerciseId  String  @unique
+     exerciseId  String
      name        String
      series      Int
      repetitions Int

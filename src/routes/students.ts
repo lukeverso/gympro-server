@@ -52,11 +52,13 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                     password: z.string(),
                     birthdate: z.string(),
                     telephone: z.string(),
+                    code: z.string(),
                     street: z.string(),
                     number: z.string(),
                     complement: z.string().nullable(),
+                    district: z.string(),
                     city: z.string(),
-                    country: z.string(),
+                    state: z.string()
                });
 
                const student = body.parse(request.body);
@@ -73,11 +75,13 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                          birthdate: student.birthdate,
                          telephone: student.telephone,
                          status: true,
+                         code: student.code,
                          street: student.street,
                          number: student.number,
                          complement: student.complement,
+                         district: student.district,
                          city: student.city,
-                         country: student.country,
+                         state: student.state
                     }
                });
 
@@ -183,14 +187,23 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                const body = z.object({
                     name: z.string(),
-                    username: z.string(),
+                    surname: z.string(),
                     email: z.string().email(),
                     password: z.string(),
                     birthdate: z.string(),
-                    telephone: z.string()
+                    telephone: z.string(),
+                    code: z.string(),
+                    street: z.string(),
+                    number: z.string(),
+                    complement: z.string().nullable(),
+                    district: z.string(),
+                    city: z.string(),
+                    state: z.string()
                });
 
                const student = body.parse(request.body);
+
+               const fullname = student.name + ' ' + student.surname;
 
                const hashedPassword = await bcrypt.hash(student.password, salt);
 
@@ -199,11 +212,18 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                          id
                     },
                     data: {
-                         name: student.name,
+                         name: fullname,
                          email: student.email,
+                         password: hashedPassword,
                          birthdate: student.birthdate,
                          telephone: student.telephone,
-                         password: hashedPassword
+                         code: student.code,
+                         street: student.street,
+                         number: student.number,
+                         complement: student.complement,
+                         district: student.district,
+                         city: student.city,
+                         state: student.state
                     }
                });
 
