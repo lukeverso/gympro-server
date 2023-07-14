@@ -8,6 +8,7 @@ import { measuresRoutes } from './routes/measures';
 import { teachersRoutes } from './routes/teachers';
 import { studentsRoutes } from './routes/students';
 import { workoutsRoutes } from './routes/workouts';
+import { notificationsRoutes } from './routes/notifications';
 
 const fastify = Fastify({
      logger: true
@@ -27,6 +28,7 @@ fastify.register(measuresRoutes);
 fastify.register(teachersRoutes);
 fastify.register(studentsRoutes);
 fastify.register(workoutsRoutes);
+fastify.register(notificationsRoutes);
 
 fastify
      .listen({

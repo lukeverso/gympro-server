@@ -3,8 +3,8 @@ import { prisma } from '../lib/prisma';
 import { z } from 'zod';
 import { authenticate } from '../plugins/authenticate';
 
-export async function workoutsRoutes(fastify: FastifyInstance) {
-     fastify.get('/me/:id', {
+export async function notificationsRoutes(fastify: FastifyInstance) {
+     fastify.get('/notifications/:id', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -14,26 +14,19 @@ export async function workoutsRoutes(fastify: FastifyInstance) {
 
                const { id } = requestParams.parse(request.params);
 
-               const response = await prisma.students.findUnique({
+               const notifications = await prisma.students.findMany({
                     where: {
                          id
                     },
                     select: {
-                         name: true,
-                         sheets: {
+                         gym: {
                               select: {
-                                   id: true,
-                                   active: true,
-                                   annotations: true,
-                                   objective: true,
-                                   startDate: true,
-                                   endDate: true,
-                                   workouts: {
+                                   notifications: {
                                         select: {
                                              id: true,
-                                             focus: true,
-                                             active: true,
-                                             type: true
+                                             title: true,
+                                             expanded: true,
+                                             content: true
                                         }
                                    }
                               }
@@ -41,7 +34,7 @@ export async function workoutsRoutes(fastify: FastifyInstance) {
                     }
                });
 
-               return reply.status(200).send({ response });
+               return reply.status(200).send({ notifications });
           } catch (error) {
                console.log(error);
 

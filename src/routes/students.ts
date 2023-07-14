@@ -108,7 +108,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           return { students };
      });
 
-     // Get a specific student
+     // Get a specific student's data
      fastify.get('/students/:id', {
           preHandler: authenticate
      }, async (request, reply) => {
@@ -125,33 +125,9 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                select: {
                     name: true,
                     email: true,
+                    telephone: true,
                     birthdate: true,
-                    telephone: true
-               }
-          });
 
-          return { student };
-     });
-
-     // Get a specific student
-     fastify.get('/students/me/:id', {
-          preHandler: authenticate
-     }, async (request, reply) => {
-          const params = z.object({
-               id: z.string().uuid()
-          });
-
-          const { id } = params.parse(request.params);
-
-          const student = await prisma.students.findUnique({
-               where: {
-                    id
-               },
-               select: {
-                    name: true,
-                    email: true,
-                    birthdate: true,
-                    telephone: true
                }
           });
 
