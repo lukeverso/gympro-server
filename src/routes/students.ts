@@ -258,4 +258,396 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                });
           };
      });
+
+     // Get student's name
+     fastify.get('/students/me/:id/name', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          try {
+               const params = z.object({
+                    id: z.string().uuid()
+               });
+
+               const { id } = params.parse(request.params);
+
+               const user = await prisma.students.findFirst({
+                    where: {
+                         id
+                    },
+                    select: {
+                         name: true
+                    }
+               });
+
+               if (!user) return reply.status(400).send({
+                    status: 'error',
+                    message: 'User not found.'
+               });
+
+               return reply.status(200).send({ user });
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
+     });
+
+     // Update student's name
+     fastify.patch('/students/me/:id/name', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          try {
+               const params = z.object({
+                    id: z.string().uuid()
+               });
+
+               const { id } = params.parse(request.params);
+
+               const body = z.object({
+                    name: z.string(),
+                    surname: z.string()
+               });
+
+               const { name, surname } = body.parse(request.body);
+
+               const fullname = name + ' ' + surname;
+
+               const user = await prisma.students.findFirst({
+                    where: {
+                         id
+                    }
+               });
+
+               if (!user) return reply.status(400).send({
+                    status: 'error',
+                    message: 'User not found.'
+               });
+
+               await prisma.students.update({
+                    where: {
+                         id
+                    },
+                    data: {
+                         name: fullname
+                    }
+               });
+
+               return reply.status(200).send({
+                    status: 'success',
+                    message: 'Nome editado com sucesso.'
+               });
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
+     });
+
+     // Get student's e-mail
+     fastify.get('/students/me/:id/email', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          try {
+               const params = z.object({
+                    id: z.string().uuid()
+               });
+
+               const { id } = params.parse(request.params);
+
+               const user = await prisma.students.findFirst({
+                    where: {
+                         id
+                    },
+                    select: {
+                         email: true
+                    }
+               });
+
+               if (!user) return reply.status(400).send({
+                    status: 'error',
+                    message: 'User not found.'
+               });
+
+               return reply.status(200).send({ user });
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
+     });
+
+     // Update student's e-mail
+     fastify.patch('/students/me/:id/email', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          try {
+               const params = z.object({
+                    id: z.string().uuid()
+               });
+
+               const { id } = params.parse(request.params);
+
+               const body = z.object({
+                    email: z.string().email()
+               });
+
+               const { email } = body.parse(request.body);
+
+               const user = await prisma.students.findFirst({
+                    where: {
+                         id
+                    }
+               });
+
+               if (!user) return reply.status(400).send({
+                    status: 'error',
+                    message: 'User not found.'
+               });
+
+               await prisma.students.update({
+                    where: {
+                         id
+                    },
+                    data: {
+                         email
+                    }
+               });
+
+               return reply.status(200).send({
+                    status: 'success',
+                    message: 'E-mail editado com sucesso.'
+               });
+          } catch (error) {
+               if (error instanceof z.ZodError) {
+                    reply.status(400).send({
+                         status: 'error',
+                         message: error.errors[0].message
+                    });
+               };
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
+     });
+
+     // Get student's e-mail
+     fastify.get('/students/me/:id/telephone', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          try {
+               const params = z.object({
+                    id: z.string().uuid()
+               });
+
+               const { id } = params.parse(request.params);
+
+               const user = await prisma.students.findFirst({
+                    where: {
+                         id
+                    },
+                    select: {
+                         telephone: true
+                    }
+               });
+
+               if (!user) return reply.status(400).send({
+                    status: 'error',
+                    message: 'User not found.'
+               });
+
+               return reply.status(200).send({ user });
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
+     });
+
+     // Update student's e-mail
+     fastify.patch('/students/me/:id/telephone', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          try {
+               const params = z.object({
+                    id: z.string().uuid()
+               });
+
+               const { id } = params.parse(request.params);
+
+               const body = z.object({
+                    telephone: z.string()
+               });
+
+               const { telephone } = body.parse(request.body);
+
+               const user = await prisma.students.findFirst({
+                    where: {
+                         id
+                    }
+               });
+
+               if (!user) return reply.status(400).send({
+                    status: 'error',
+                    message: 'User not found.'
+               });
+
+               await prisma.students.update({
+                    where: {
+                         id
+                    },
+                    data: {
+                         telephone
+                    }
+               });
+
+               return reply.status(200).send({
+                    status: 'success',
+                    message: 'Telefone editado com sucesso.'
+               });
+          } catch (error) {
+               if (error instanceof z.ZodError) {
+                    reply.status(400).send({
+                         status: 'error',
+                         message: error.errors[0].message
+                    });
+               };
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
+     });
+
+     // Get student's e-mail
+     fastify.get('/students/me/:id/address', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          try {
+               const params = z.object({
+                    id: z.string().uuid()
+               });
+
+               const { id } = params.parse(request.params);
+
+               const user = await prisma.students.findFirst({
+                    where: {
+                         id
+                    },
+                    select: {
+                         code: true,
+                         city: true,
+                         complement: true,
+                         district: true,
+                         number: true,
+                         state: true,
+                         street: true
+                    }
+               });
+
+               if (!user) return reply.status(400).send({
+                    status: 'error',
+                    message: 'User not found.'
+               });
+
+               return reply.status(200).send({ user });
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
+     });
+
+     // Update student's e-mail
+     fastify.patch('/students/me/:id/address', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          try {
+               const params = z.object({
+                    id: z.string().uuid()
+               });
+
+               const { id } = params.parse(request.params);
+
+               const body = z.object({
+                    code: z.string(),
+                    city: z.string(),
+                    complement: z.string(),
+                    district: z.string(),
+                    number: z.string(),
+                    state: z.string(),
+                    street: z.string()
+               });
+
+               const {
+                    code,
+                    city,
+                    complement,
+                    district,
+                    number,
+                    state,
+                    street
+               } = body.parse(request.body);
+
+               const user = await prisma.students.findFirst({
+                    where: {
+                         id
+                    }
+               });
+
+               if (!user) return reply.status(400).send({
+                    status: 'error',
+                    message: 'User not found.'
+               });
+
+               await prisma.students.update({
+                    where: {
+                         id
+                    },
+                    data: {
+                         code,
+                         city,
+                         complement,
+                         district,
+                         number,
+                         state,
+                         street
+                    }
+               });
+
+               return reply.status(200).send({
+                    status: 'success',
+                    message: 'Telefone editado com sucesso.'
+               });
+          } catch (error) {
+               if (error instanceof z.ZodError) {
+                    reply.status(400).send({
+                         status: 'error',
+                         message: error.errors[0].message
+                    });
+               };
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
+     });
 };
