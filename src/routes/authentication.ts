@@ -3,10 +3,8 @@ import { prisma } from '../lib/prisma';
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
 
-const salt = 10;
-
 export async function authenticationRoutes(fastify: FastifyInstance) {
-     // Login student
+     // LOGIN PARA ALUNOS
      fastify.post('/students/login', async (request, reply) => {
           const loginBody = z.object({
                email: z.string(),
@@ -51,7 +49,7 @@ export async function authenticationRoutes(fastify: FastifyInstance) {
           });
      });
 
-     // Login teacher
+     // LOGIN PARA PROFESSORES
      fastify.post('/teachers/login', async (request, reply) => {
           const loginBody = z.object({
                email: z.string(),

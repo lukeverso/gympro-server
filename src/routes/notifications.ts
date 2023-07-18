@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { authenticate } from '../plugins/authenticate';
 
 export async function notificationsRoutes(fastify: FastifyInstance) {
+     // BUSCA AS NOTIFICAÇÕES PELO ID DE UM ALUNO
      fastify.get('/notifications/:id', {
           preHandler: authenticate
      }, async (request, reply) => {
@@ -27,6 +28,9 @@ export async function notificationsRoutes(fastify: FastifyInstance) {
                                              title: true,
                                              expanded: true,
                                              content: true
+                                        },
+                                        orderBy: {
+                                             createdAt: 'desc'
                                         }
                                    }
                               }

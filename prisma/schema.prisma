@@ -38,11 +38,11 @@ model Students {
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 
-     teacher  Teachers? @relation(fields: [teacherId], references: [id])
-     gym      Gyms?     @relation(fields: [gymId], references: [id])
-     measures Measures? @relation(fields: [measuresId], references: [id], onDelete: Cascade)
+     teacher Teachers? @relation(fields: [teacherId], references: [id])
+     gym     Gyms?     @relation(fields: [gymId], references: [id])
 
-     sheets Sheets[]
+     measures Measures[]
+     sheets   Sheets[]
 }
 
 model Teachers {
@@ -109,25 +109,25 @@ model Notifications {
 }
 
 model Measures {
-     id        String @id @default(uuid())
-     studentId String @unique
+     id         String  @id @default(uuid())
+     studentsId String?
 
-     height   String?
-     weight   String?
-     bmi      String?
-     chest    String?
-     wingspan String?
-     waist    String?
-     hip      String?
-     arm      String?
-     thigh    String?
-     calf     String?
-     bodyFat  String?
+     height    String?
+     weight    String?
+     bmi       String?
+     chest     String?
+     wingspan  String?
+     waist     String?
+     hip       String?
+     arm       String?
+     thigh     String?
+     calf      String?
+     shoulders String?
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 
-     student Students[]
+     student Students? @relation(fields: [studentsId], references: [id])
 }
 
 model Sheets {

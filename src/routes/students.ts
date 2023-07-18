@@ -7,7 +7,7 @@ import bcrypt from 'bcrypt';
 const salt = 10;
 
 export async function studentsRoutes(fastify: FastifyInstance) {
-     // Verify if an email has been taken by a student
+     // VERIFICAR DISPONIBILIDADE DE E-MAIL PARA ALUNOS
      fastify.post('/students/verify-email', async (request, reply) => {
           try {
                const querySchema = z.object({
@@ -16,13 +16,13 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                const { email } = querySchema.parse(request.query);
 
-               const user = await prisma.students.findUnique({
+               const student = await prisma.students.findUnique({
                     where: {
                          email
                     }
                });
 
-               if (user?.email === email) {
+               if (student?.email === email) {
                     return reply.status(200).send({
                          status: 'error',
                          message: 'Este e-mail está em uso.'
@@ -42,7 +42,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           }
      });
 
-     // Create a student
+     // CRIAR UM ALUNO
      fastify.post('/students', async (request, reply) => {
           try {
                const body = z.object({
@@ -99,114 +99,53 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           };
      });
 
-     // Get a list of the students
-     fastify.get('/students', {
-          preHandler: authenticate
-     }, async (request, reply) => {
-          const students = await prisma.students.findMany();
-
-          return { students };
-     });
-
-     // Get a specific student's data
-     fastify.get('/students/:id', {
-          preHandler: authenticate
-     }, async (request, reply) => {
-          const params = z.object({
-               id: z.string().uuid()
-          });
-
-          const { id } = params.parse(request.params);
-
-          const student = await prisma.students.findUnique({
-               where: {
-                    id
-               },
-               select: {
-                    name: true,
-                    email: true,
-                    telephone: true,
-                    birthdate: true,
-
-               }
-          });
-
-          return { student };
-     });
-
-     // Edit a student
-     fastify.put('/students/:id', {
+     // RECEBE OS DADOS DO ALUNO LOGADO
+     fastify.get('/students/me/:id', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
-               const params = z.object({
-                    id: z.string().uuid()
+               const requestParams = z.object({
+                    id: z.string()
                });
 
-               const { id } = params.parse(request.params);
+               const { id } = requestParams.parse(request.params);
 
-               const studentExists = await prisma.students.findFirst({
-                    where: {
-                         id
-                    }
-               });
-
-               if (!studentExists) return reply.status(400).send({
-                    status: 'error',
-                    message: 'Student not found.'
-               });
-
-               if (id !== studentExists.id) return reply.status(400).send({
-                    status: 'error',
-                    message: "You cannot update another user's data."
-               });
-
-               const body = z.object({
-                    name: z.string(),
-                    surname: z.string(),
-                    email: z.string().email(),
-                    password: z.string(),
-                    birthdate: z.string(),
-                    telephone: z.string(),
-                    code: z.string(),
-                    street: z.string(),
-                    number: z.string(),
-                    complement: z.string().nullable(),
-                    district: z.string(),
-                    city: z.string(),
-                    state: z.string()
-               });
-
-               const student = body.parse(request.body);
-
-               const fullname = student.name + ' ' + student.surname;
-
-               const hashedPassword = await bcrypt.hash(student.password, salt);
-
-               await prisma.students.update({
+               const response = await prisma.students.findUnique({
                     where: {
                          id
                     },
-                    data: {
-                         name: fullname,
-                         email: student.email,
-                         password: hashedPassword,
-                         birthdate: student.birthdate,
-                         telephone: student.telephone,
-                         code: student.code,
-                         street: student.street,
-                         number: student.number,
-                         complement: student.complement,
-                         district: student.district,
-                         city: student.city,
-                         state: student.state
+                    select: {
+                         name: true,
+                         teacher: {
+                              select: {
+                                   name: true,
+                                   birthdate: true,
+                                   email: true,
+                                   telephone: true
+                              }
+                         },
+                         sheets: {
+                              select: {
+                                   id: true,
+                                   active: true,
+                                   annotations: true,
+                                   objective: true,
+                                   startDate: true,
+                                   endDate: true,
+                                   workouts: {
+                                        select: {
+                                             id: true,
+                                             focus: true,
+                                             active: true,
+                                             type: true
+                                        }
+                                   }
+                              }
+                         }
                     }
                });
 
-               return reply.status(200).send({
-                    status: 'success',
-                    message: 'Student updated successfully.'
-               });
+               return reply.status(200).send({ response });
           } catch (error) {
                console.log(error);
 
@@ -217,7 +156,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           };
      });
 
-     // Delete a student
+     // APAGAR UM ALUNO
      fastify.delete('/students/:id', {
           preHandler: authenticate
      }, async (request, reply) => {
@@ -228,15 +167,15 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                const { id } = params.parse(request.body);
 
-               const userExists = await prisma.students.findFirst({
+               const student = await prisma.students.findFirst({
                     where: {
                          id
                     },
                });
 
-               if (!userExists) return reply.status(400).send({
+               if (!student) return reply.status(400).send({
                     status: 'error',
-                    message: 'User not found.'
+                    message: 'student not found.'
                });
 
                await prisma.students.delete({
@@ -247,7 +186,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                return reply.status(200).send({
                     status: 'success',
-                    message: 'User deleted with success.'
+                    message: 'student deleted with success.'
                });
           } catch (error) {
                console.log(error);
@@ -259,7 +198,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           };
      });
 
-     // Get student's name
+     // BUSCA O NOME DO ALUNO
      fastify.get('/students/me/:id/name', {
           preHandler: authenticate
      }, async (request, reply) => {
@@ -270,7 +209,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                const { id } = params.parse(request.params);
 
-               const user = await prisma.students.findFirst({
+               const student = await prisma.students.findFirst({
                     where: {
                          id
                     },
@@ -279,12 +218,12 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                     }
                });
 
-               if (!user) return reply.status(400).send({
+               if (!student) return reply.status(400).send({
                     status: 'error',
-                    message: 'User not found.'
+                    message: 'student not found.'
                });
 
-               return reply.status(200).send({ user });
+               return reply.status(200).send({ student });
           } catch (error) {
                console.log(error);
 
@@ -295,7 +234,43 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           };
      });
 
-     // Update student's name
+     // BUSCA O NOME DO ALUNO
+     fastify.get('/students/me/:id/name', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          try {
+               const params = z.object({
+                    id: z.string().uuid()
+               });
+
+               const { id } = params.parse(request.params);
+
+               const student = await prisma.students.findFirst({
+                    where: {
+                         id
+                    },
+                    select: {
+                         name: true
+                    }
+               });
+
+               if (!student) return reply.status(400).send({
+                    status: 'error',
+                    message: 'student not found.'
+               });
+
+               return reply.status(200).send({ student });
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
+     });
+
+     // ATUALIZA O NOME DO ALUNO
      fastify.patch('/students/me/:id/name', {
           preHandler: authenticate
      }, async (request, reply) => {
@@ -315,15 +290,15 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                const fullname = name + ' ' + surname;
 
-               const user = await prisma.students.findFirst({
+               const student = await prisma.students.findFirst({
                     where: {
                          id
                     }
                });
 
-               if (!user) return reply.status(400).send({
+               if (!student) return reply.status(400).send({
                     status: 'error',
-                    message: 'User not found.'
+                    message: 'student not found.'
                });
 
                await prisma.students.update({
@@ -349,7 +324,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           };
      });
 
-     // Get student's e-mail
+     // BUSCA O E-MAIL DO ALUNO
      fastify.get('/students/me/:id/email', {
           preHandler: authenticate
      }, async (request, reply) => {
@@ -360,7 +335,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                const { id } = params.parse(request.params);
 
-               const user = await prisma.students.findFirst({
+               const student = await prisma.students.findFirst({
                     where: {
                          id
                     },
@@ -369,12 +344,12 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                     }
                });
 
-               if (!user) return reply.status(400).send({
+               if (!student) return reply.status(400).send({
                     status: 'error',
-                    message: 'User not found.'
+                    message: 'student not found.'
                });
 
-               return reply.status(200).send({ user });
+               return reply.status(200).send({ student });
           } catch (error) {
                console.log(error);
 
@@ -385,7 +360,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           };
      });
 
-     // Update student's e-mail
+     // ATUALIZA O E-MAIL DO ALUNO
      fastify.patch('/students/me/:id/email', {
           preHandler: authenticate
      }, async (request, reply) => {
@@ -402,15 +377,15 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                const { email } = body.parse(request.body);
 
-               const user = await prisma.students.findFirst({
+               const student = await prisma.students.findFirst({
                     where: {
                          id
                     }
                });
 
-               if (!user) return reply.status(400).send({
+               if (!student) return reply.status(400).send({
                     status: 'error',
-                    message: 'User not found.'
+                    message: 'student not found.'
                });
 
                await prisma.students.update({
@@ -441,7 +416,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           };
      });
 
-     // Get student's e-mail
+     // BUSCA O TELEFONE DO ALUNO
      fastify.get('/students/me/:id/telephone', {
           preHandler: authenticate
      }, async (request, reply) => {
@@ -452,7 +427,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                const { id } = params.parse(request.params);
 
-               const user = await prisma.students.findFirst({
+               const student = await prisma.students.findFirst({
                     where: {
                          id
                     },
@@ -461,12 +436,12 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                     }
                });
 
-               if (!user) return reply.status(400).send({
+               if (!student) return reply.status(400).send({
                     status: 'error',
-                    message: 'User not found.'
+                    message: 'student not found.'
                });
 
-               return reply.status(200).send({ user });
+               return reply.status(200).send({ student });
           } catch (error) {
                console.log(error);
 
@@ -477,7 +452,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           };
      });
 
-     // Update student's e-mail
+     // ATUALIZA O TELEFONE DO ALUNO
      fastify.patch('/students/me/:id/telephone', {
           preHandler: authenticate
      }, async (request, reply) => {
@@ -494,15 +469,15 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                const { telephone } = body.parse(request.body);
 
-               const user = await prisma.students.findFirst({
+               const student = await prisma.students.findFirst({
                     where: {
                          id
                     }
                });
 
-               if (!user) return reply.status(400).send({
+               if (!student) return reply.status(400).send({
                     status: 'error',
-                    message: 'User not found.'
+                    message: 'student not found.'
                });
 
                await prisma.students.update({
@@ -533,7 +508,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           };
      });
 
-     // Get student's e-mail
+     // BUSCA O ENDEREÇO DO ALUNO
      fastify.get('/students/me/:id/address', {
           preHandler: authenticate
      }, async (request, reply) => {
@@ -544,7 +519,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                const { id } = params.parse(request.params);
 
-               const user = await prisma.students.findFirst({
+               const student = await prisma.students.findFirst({
                     where: {
                          id
                     },
@@ -559,12 +534,12 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                     }
                });
 
-               if (!user) return reply.status(400).send({
+               if (!student) return reply.status(400).send({
                     status: 'error',
-                    message: 'User not found.'
+                    message: 'student not found.'
                });
 
-               return reply.status(200).send({ user });
+               return reply.status(200).send({ student });
           } catch (error) {
                console.log(error);
 
@@ -575,7 +550,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           };
      });
 
-     // Update student's e-mail
+     // ATUALIZA O ENDEREÇO DO ALUNO
      fastify.patch('/students/me/:id/address', {
           preHandler: authenticate
      }, async (request, reply) => {
@@ -606,15 +581,15 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                     street
                } = body.parse(request.body);
 
-               const user = await prisma.students.findFirst({
+               const student = await prisma.students.findFirst({
                     where: {
                          id
                     }
                });
 
-               if (!user) return reply.status(400).send({
+               if (!student) return reply.status(400).send({
                     status: 'error',
-                    message: 'User not found.'
+                    message: 'student not found.'
                });
 
                await prisma.students.update({
@@ -634,7 +609,143 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                return reply.status(200).send({
                     status: 'success',
-                    message: 'Telefone editado com sucesso.'
+                    message: 'Endereço editado com sucesso.'
+               });
+          } catch (error) {
+               if (error instanceof z.ZodError) {
+                    reply.status(400).send({
+                         status: 'error',
+                         message: error.errors[0].message
+                    });
+               };
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
+     });
+
+     // BUSCA AS MEDIDAS DO ALUNO
+     fastify.get('/students/me/:id/measures', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          try {
+               const params = z.object({
+                    id: z.string().uuid()
+               });
+
+               const { id } = params.parse(request.params);
+
+               const measures = await prisma.students.findFirst({
+                    where: {
+                         id
+                    },
+                    select: {
+                         measures: {
+                              select: {
+                                   arm: true,
+                                   bmi: true,
+                                   calf: true,
+                                   chest: true,
+                                   height: true,
+                                   hip: true,
+                                   shoulders: true,
+                                   thigh: true,
+                                   waist: true,
+                                   weight: true,
+                                   wingspan: true
+                              }
+                         }
+                    }
+               });
+
+               if (!measures) return reply.status(400).send({
+                    status: 'error',
+                    message: 'Measures not found.'
+               });
+
+               return reply.status(200).send({ measures: measures.measures[0] });
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
+     });
+
+     // ATUALIZA AS MEDIDAS DO ALUNO
+     fastify.post('/students/me/:id/measures', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          try {
+               const params = z.object({
+                    id: z.string().uuid()
+               });
+
+               const { id } = params.parse(request.params);
+
+               const body = z.object({
+                    arm: z.string(),
+                    bmi: z.string(),
+                    calf: z.string(),
+                    chest: z.string(),
+                    height: z.string(),
+                    hip: z.string(),
+                    shoulders: z.string(),
+                    thigh: z.string(),
+                    waist: z.string(),
+                    weight: z.string(),
+                    wingspan: z.string()
+               });
+
+               const {
+                    arm,
+                    bmi,
+                    calf,
+                    chest,
+                    height,
+                    hip,
+                    shoulders,
+                    thigh,
+                    waist,
+                    weight,
+                    wingspan
+               } = body.parse(request.body);
+
+               const student = await prisma.students.findFirst({
+                    where: {
+                         id
+                    }
+               });
+
+               if (!student) return reply.status(400).send({
+                    status: 'error',
+                    message: 'student not found.'
+               });
+
+               await prisma.measures.create({
+                    data: {
+                         studentsId: id,
+                         arm,
+                         bmi,
+                         calf,
+                         chest,
+                         height,
+                         hip,
+                         shoulders,
+                         thigh,
+                         waist,
+                         weight,
+                         wingspan
+                    }
+               });
+
+               return reply.status(200).send({
+                    status: 'success',
+                    message: 'Medidas alteradas com sucesso.'
                });
           } catch (error) {
                if (error instanceof z.ZodError) {

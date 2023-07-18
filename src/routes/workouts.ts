@@ -4,51 +4,5 @@ import { z } from 'zod';
 import { authenticate } from '../plugins/authenticate';
 
 export async function workoutsRoutes(fastify: FastifyInstance) {
-     fastify.get('/me/:id', {
-          preHandler: authenticate
-     }, async (request, reply) => {
-          try {
-               const requestParams = z.object({
-                    id: z.string()
-               });
-
-               const { id } = requestParams.parse(request.params);
-
-               const response = await prisma.students.findUnique({
-                    where: {
-                         id
-                    },
-                    select: {
-                         name: true,
-                         sheets: {
-                              select: {
-                                   id: true,
-                                   active: true,
-                                   annotations: true,
-                                   objective: true,
-                                   startDate: true,
-                                   endDate: true,
-                                   workouts: {
-                                        select: {
-                                             id: true,
-                                             focus: true,
-                                             active: true,
-                                             type: true
-                                        }
-                                   }
-                              }
-                         }
-                    }
-               });
-
-               return reply.status(200).send({ response });
-          } catch (error) {
-               console.log(error);
-
-               return reply.status(500).send({
-                    status: 'error',
-                    message: `Ocorreu um erro: ${error}`
-               });
-          };
-     });
+     
 };
