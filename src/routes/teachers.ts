@@ -201,7 +201,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
      });
 
      // BUSCA O NOME DO ALUNO
-     fastify.get('/teachers/me/:id/name', {
+     fastify.get('/teachers/:id/name', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -237,7 +237,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
      });
 
      // ATUALIZA O NOME DO ALUNO
-     fastify.patch('/teachers/me/:id/name', {
+     fastify.patch('/teachers/:id/name', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -291,7 +291,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
      });
 
      // BUSCA O E-MAIL DO ALUNO
-     fastify.get('/teachers/me/:id/email', {
+     fastify.get('/teachers/:id/email', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -327,7 +327,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
      });
 
      // ATUALIZA O E-MAIL DO ALUNO
-     fastify.patch('/teachers/me/:id/email', {
+     fastify.patch('/teachers/:id/email', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -383,7 +383,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
      });
 
      // BUSCA O TELEFONE DO ALUNO
-     fastify.get('/teachers/me/:id/telephone', {
+     fastify.get('/teachers/:id/telephone', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -419,7 +419,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
      });
 
      // ATUALIZA O TELEFONE DO ALUNO
-     fastify.patch('/teachers/me/:id/telephone', {
+     fastify.patch('/teachers/:id/telephone', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -475,7 +475,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
      });
 
      // BUSCA O ENDEREÇO DO ALUNO
-     fastify.get('/teachers/me/:id/address', {
+     fastify.get('/teachers/:id/address', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -517,7 +517,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
      });
 
      // ATUALIZA O ENDEREÇO DO ALUNO
-     fastify.patch('/teachers/me/:id/address', {
+     fastify.patch('/teachers/:id/address', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {

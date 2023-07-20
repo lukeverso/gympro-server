@@ -149,9 +149,10 @@ model Sheets {
 model Workouts {
      id       String  @id @default(uuid())
      sheetsId String?
-     type     String
-     focus    String
-     active   Boolean
+
+     type   String
+     focus  String
+     active Boolean
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
@@ -164,6 +165,7 @@ model Workouts {
 model Exercises {
      id          String  @id @default(uuid())
      exerciseId  String
+     
      name        String
      series      Int
      repetitions Int

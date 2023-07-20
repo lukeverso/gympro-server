@@ -100,7 +100,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
      });
 
      // RECEBE OS DADOS DO ALUNO LOGADO
-     fastify.get('/students/me/:id', {
+     fastify.get('/students/:id', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -199,43 +199,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
      });
 
      // BUSCA O NOME DO ALUNO
-     fastify.get('/students/me/:id/name', {
-          preHandler: authenticate
-     }, async (request, reply) => {
-          try {
-               const params = z.object({
-                    id: z.string().uuid()
-               });
-
-               const { id } = params.parse(request.params);
-
-               const student = await prisma.students.findFirst({
-                    where: {
-                         id
-                    },
-                    select: {
-                         name: true
-                    }
-               });
-
-               if (!student) return reply.status(400).send({
-                    status: 'error',
-                    message: 'student not found.'
-               });
-
-               return reply.status(200).send({ student });
-          } catch (error) {
-               console.log(error);
-
-               return reply.status(500).send({
-                    status: 'error',
-                    message: `Ocorreu um erro: ${error}`
-               });
-          };
-     });
-
-     // BUSCA O NOME DO ALUNO
-     fastify.get('/students/me/:id/name', {
+     fastify.get('/students/:id/name', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -271,7 +235,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
      });
 
      // ATUALIZA O NOME DO ALUNO
-     fastify.patch('/students/me/:id/name', {
+     fastify.patch('/students/:id/name', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -325,7 +289,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
      });
 
      // BUSCA O E-MAIL DO ALUNO
-     fastify.get('/students/me/:id/email', {
+     fastify.get('/students/:id/email', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -361,7 +325,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
      });
 
      // ATUALIZA O E-MAIL DO ALUNO
-     fastify.patch('/students/me/:id/email', {
+     fastify.patch('/students/:id/email', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -417,7 +381,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
      });
 
      // BUSCA O TELEFONE DO ALUNO
-     fastify.get('/students/me/:id/telephone', {
+     fastify.get('/students/:id/telephone', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -453,7 +417,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
      });
 
      // ATUALIZA O TELEFONE DO ALUNO
-     fastify.patch('/students/me/:id/telephone', {
+     fastify.patch('/students/:id/telephone', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -509,7 +473,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
      });
 
      // BUSCA O ENDEREÇO DO ALUNO
-     fastify.get('/students/me/:id/address', {
+     fastify.get('/students/:id/address', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -551,7 +515,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
      });
 
      // ATUALIZA O ENDEREÇO DO ALUNO
-     fastify.patch('/students/me/:id/address', {
+     fastify.patch('/students/:id/address', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -627,7 +591,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
      });
 
      // BUSCA AS MEDIDAS DO ALUNO
-     fastify.get('/students/me/:id/measures', {
+     fastify.get('/students/:id/measures', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -655,6 +619,9 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                                    waist: true,
                                    weight: true,
                                    wingspan: true
+                              },
+                              orderBy: {
+                                   createdAt: 'desc'
                               }
                          }
                     }
@@ -677,7 +644,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
      });
 
      // ATUALIZA AS MEDIDAS DO ALUNO
-     fastify.post('/students/me/:id/measures', {
+     fastify.post('/students/:id/measures', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
