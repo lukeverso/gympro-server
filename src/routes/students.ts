@@ -6,6 +6,28 @@ import bcrypt from 'bcrypt';
 
 const salt = 10;
 
+function calculateAge(birthdate: string) {
+     const today = new Date();
+     const birthDateParts = birthdate.split('/');
+     const birthDate = new Date(
+          parseInt(birthDateParts[2], 10),
+          parseInt(birthDateParts[1], 10) - 1,
+          parseInt(birthDateParts[0], 10)
+     );
+
+     let age = today.getFullYear() - birthDate.getFullYear();
+     const monthToday = today.getMonth();
+     const dayToday = today.getDate();
+     const monthBirth = birthDate.getMonth();
+     const dayBirth = birthDate.getDate();
+
+     if (monthToday < monthBirth || (monthToday === monthBirth && dayToday < dayBirth)) {
+          age--;
+     };
+
+     return age;
+};
+
 export async function studentsRoutes(fastify: FastifyInstance) {
      // VERIFICAR DISPONIBILIDADE DE E-MAIL PARA ALUNOS
      fastify.post('/students/verify-email', async (request, reply) => {
@@ -154,6 +176,63 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                     message: `Ocorreu um erro: ${error}`
                });
           };
+     });
+
+     fastify.get('/students/details/:id', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          try {
+               const requestParams = z.object({
+                    id: z.string()
+               });
+
+               const { id } = requestParams.parse(request.params);
+
+               const details = await prisma.students.findUnique({
+                    where: {
+                         id
+                    },
+                    select: {
+                         name: true,
+                         birthdate: true,
+                         email: true,
+                         telephone: true,
+                         status: true,
+                         sheets: {
+                              select: {
+                                   workouts: {
+                                        select: {
+                                             focus: true
+                                        }
+                                   }
+                              }
+                         }
+                    }
+               });
+
+               if (!details) {
+                    return reply.status(404).send({
+                         status: 'error',
+                         message: 'Student not found.'
+                    });
+               }
+
+               const age = calculateAge(details.birthdate);
+
+               const studentDetails = {
+                    ...details,
+                    age
+               };
+
+               return reply.status(200).send(studentDetails);
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          }
      });
 
      // APAGAR UM ALUNO

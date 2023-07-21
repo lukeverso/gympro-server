@@ -6,6 +6,28 @@ import bcrypt from 'bcrypt';
 
 const salt = 10;
 
+function calculateAge(birthdate: string) {
+     const today = new Date();
+     const birthDateParts = birthdate.split('/');
+     const birthDate = new Date(
+          parseInt(birthDateParts[2], 10),
+          parseInt(birthDateParts[1], 10) - 1,
+          parseInt(birthDateParts[0], 10)
+     );
+
+     let age = today.getFullYear() - birthDate.getFullYear();
+     const monthToday = today.getMonth();
+     const dayToday = today.getDate();
+     const monthBirth = birthDate.getMonth();
+     const dayBirth = birthDate.getDate();
+
+     if (monthToday < monthBirth || (monthToday === monthBirth && dayToday < dayBirth)) {
+          age--;
+     };
+
+     return age;
+};
+
 export async function teachersRoutes(fastify: FastifyInstance) {
      // VERIFICAR DISPONIBILIDADE DE E-MAIL PARA PROFESSORES
      fastify.post('/teachers/verify-email', async (request, reply) => {
@@ -112,6 +134,58 @@ export async function teachersRoutes(fastify: FastifyInstance) {
           };
      });
 
+     // RECEBE OS DADOS DO PROFESSOR LOGADO
+     fastify.get('/teachers/:id', {
+          preHandler: authenticate,
+     }, async (request, reply) => {
+          try {
+               const requestParams = z.object({
+                    id: z.string()
+               });
+
+               const { id } = requestParams.parse(request.params);
+
+               const response = await prisma.teachers.findUnique({
+                    where: {
+                         id
+                    },
+                    select: {
+                         name: true,
+                         students: {
+                              select: {
+                                   id: true,
+                                   name: true,
+                                   birthdate: true,
+                              },
+                              orderBy: {
+                                   createdAt: 'desc'
+                              },
+                              take: 5
+                         }
+                    }
+               });
+
+               const studentsWithAge = response?.students.map(student => ({
+                    ...student,
+                    age: calculateAge(student.birthdate),
+               }));
+
+               const formattedResponse = {
+                    name: response?.name,
+                    students: studentsWithAge,
+               };
+
+               return reply.status(200).send(formattedResponse);
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          }
+     });
+
      // APAGAR UM PROFESSOR
      fastify.delete('/teachers/:id', {
           preHandler: authenticate
@@ -155,49 +229,42 @@ export async function teachersRoutes(fastify: FastifyInstance) {
      });
 
      // ADICIONAR UM ALUNO A UM PROFESSOR
-     fastify.post('/teachers/add/:student', {
+     fastify.post('/teachers/:teacher/add/:student', {
           preHandler: authenticate
      }, async (request, reply) => {
-          const params = z.object({
-               student: z.string().uuid()
-          });
+          try {
+               const params = z.object({
+                    teacher: z.string().uuid(),
+                    student: z.string().uuid()
+               });
 
-          const { student } = params.parse(request.params);
+               const { teacher, student } = params.parse(request.params);
 
-          const body = z.object({
-               teacherId: z.string().uuid()
-          });
-
-          const { teacherId } = body.parse(request.body);
-
-          const teacher = await prisma.teachers.findUnique({
-               where: {
-                    id: teacherId
-               }
-          });
-
-          if (!teacher) return reply.status(400).send({
-               status: 'error',
-               message: 'Teacher not found.'
-          });
-
-          await prisma.teachers.update({
-               where: {
-                    id: teacher.id
-               },
-               data: {
-                    students: {
-                         connect: {
-                              id: student
+               await prisma.teachers.update({
+                    where: {
+                         id: teacher
+                    },
+                    data: {
+                         students: {
+                              connect: {
+                                   id: student
+                              }
                          }
                     }
-               }
-          });
+               });
 
-          return reply.status(200).send({
-               status: 'success',
-               message: 'Student added successfully.'
-          });
+               return reply.status(200).send({
+                    status: 'success',
+                    message: 'Student added successfully.'
+               });
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
      });
 
      // BUSCA O NOME DO ALUNO
