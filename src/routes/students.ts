@@ -178,6 +178,38 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           };
      });
 
+     // BUSCA ALUNO POR E-MAIL
+     fastify.get('/students/email/:email', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          try {
+               const requestParams = z.object({
+                    email: z.string()
+               });
+
+               const { email } = requestParams.parse(request.params);
+
+               const response = await prisma.students.findUnique({
+                    where: {
+                         email
+                    },
+                    select: {
+                         id: true,
+                         name: true
+                    }
+               });
+
+               return reply.status(200).send(response);
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
+     });
+
      fastify.get('/students/details/:id', {
           preHandler: authenticate
      }, async (request, reply) => {
@@ -193,6 +225,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                          id
                     },
                     select: {
+                         id: true,
                          name: true,
                          birthdate: true,
                          email: true,
@@ -202,7 +235,9 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                               select: {
                                    workouts: {
                                         select: {
-                                             focus: true
+                                             id: true,
+                                             focus: true,
+                                             type: true
                                         }
                                    }
                               }
@@ -233,6 +268,53 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                     message: `Ocorreu um erro: ${error}`
                });
           }
+     });
+
+     // INATIVAR UM ALUNO
+     fastify.patch('/students/:id/status', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          try {
+               const params = z.object({
+                    id: z.string().uuid()
+               });
+
+               const { id } = params.parse(request.params);
+
+               const student = await prisma.students.findFirst({
+                    where: {
+                         id
+                    },
+               });
+
+               if (!student) return reply.status(400).send({
+                    status: 'error',
+                    message: 'student not found.'
+               });
+               
+               const status = !student.status;
+
+               await prisma.students.update({
+                    where: {
+                         id
+                    },
+                    data: {
+                         status
+                    }
+               });
+
+               return reply.status(200).send({
+                    status: 'success',
+                    message: 'Status do aluno alterado com sucesso.'
+               });
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
      });
 
      // APAGAR UM ALUNO

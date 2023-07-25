@@ -186,6 +186,51 @@ export async function teachersRoutes(fastify: FastifyInstance) {
           }
      });
 
+     // RECEBE OS ALUNOS DO PROFESSOR LOGADO
+     fastify.get('/teachers/:id/students', {
+          preHandler: authenticate,
+     }, async (request, reply) => {
+          try {
+               const requestParams = z.object({
+                    id: z.string()
+               });
+
+               const { id } = requestParams.parse(request.params);
+
+               const response = await prisma.teachers.findUnique({
+                    where: {
+                         id
+                    },
+                    select: {
+                         students: {
+                              select: {
+                                   id: true,
+                                   name: true,
+                                   birthdate: true,
+                              },
+                              orderBy: {
+                                   name: 'asc'
+                              },
+                         }
+                    }
+               });
+
+               const students = response?.students.map(student => ({
+                    ...student,
+                    age: calculateAge(student.birthdate),
+               }));
+
+               return reply.status(200).send(students);
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          }
+     });
+
      // APAGAR UM PROFESSOR
      fastify.delete('/teachers/:id', {
           preHandler: authenticate
