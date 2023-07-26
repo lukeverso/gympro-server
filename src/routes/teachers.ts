@@ -151,6 +151,8 @@ export async function teachersRoutes(fastify: FastifyInstance) {
                     },
                     select: {
                          name: true,
+                         email: true,
+                         telephone: true,
                          students: {
                               select: {
                                    id: true,
@@ -172,6 +174,8 @@ export async function teachersRoutes(fastify: FastifyInstance) {
 
                const formattedResponse = {
                     name: response?.name,
+                    email: response?.email,
+                    telephone: response?.telephone,
                     students: studentsWithAge,
                };
 
@@ -301,6 +305,45 @@ export async function teachersRoutes(fastify: FastifyInstance) {
                return reply.status(200).send({
                     status: 'success',
                     message: 'Student added successfully.'
+               });
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `Ocorreu um erro: ${error}`
+               });
+          };
+     });
+
+     // REMOVER UM ALUNO DE UM PROFESSOR
+     fastify.post('/teachers/:teacher/delete/:student', {
+          preHandler: authenticate
+     }, async (request, reply) => {
+          try {
+               const params = z.object({
+                    teacher: z.string().uuid(),
+                    student: z.string().uuid()
+               });
+
+               const { teacher, student } = params.parse(request.params);
+
+               await prisma.teachers.update({
+                    where: {
+                         id: teacher
+                    },
+                    data: {
+                         students: {
+                              disconnect: {
+                                   id: student
+                              }
+                         }
+                    }
+               });
+
+               return reply.status(200).send({
+                    status: 'success',
+                    message: 'Student removed successfully.'
                });
           } catch (error) {
                console.log(error);

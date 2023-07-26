@@ -179,7 +179,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
      });
 
      // BUSCA ALUNO POR E-MAIL
-     fastify.get('/students/email/:email', {
+     fastify.get('/students/:email/search', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -210,7 +210,8 @@ export async function studentsRoutes(fastify: FastifyInstance) {
           };
      });
 
-     fastify.get('/students/details/:id', {
+     // LISTA OS DETALHES DE UM ALUNO
+     fastify.get('/students/:id/details', {
           preHandler: authenticate
      }, async (request, reply) => {
           try {
@@ -233,6 +234,11 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                          status: true,
                          sheets: {
                               select: {
+                                   annotations: true,
+                                   active: true,
+                                   objective: true,
+                                   endDate: true,
+                                   startDate: true,
                                    workouts: {
                                         select: {
                                              id: true,
