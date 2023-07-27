@@ -13,11 +13,12 @@
      "dependencies": {
           "@fastify/cors": "^8.3.0",
           "@fastify/jwt": "^7.0.0",
+          "@fastify/multipart": "^7.7.3",
           "@prisma/client": "^5.0.0",
           "bcrypt": "^5.1.0",
           "cloudinary": "^1.39.0",
+          "dotenv": "^16.3.1",
           "fastify": "^4.18.0",
-          "fastify-multer": "^2.0.3",
           "zod": "^3.21.4"
      },
      "devDependencies": {

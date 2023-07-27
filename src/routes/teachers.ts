@@ -153,6 +153,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
                          name: true,
                          email: true,
                          telephone: true,
+                         picture: true,
                          students: {
                               select: {
                                    id: true,
@@ -176,6 +177,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
                     name: response?.name,
                     email: response?.email,
                     telephone: response?.telephone,
+                    picture: response?.picture,
                     students: studentsWithAge,
                };
 
