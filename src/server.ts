@@ -1,7 +1,10 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
+<<<<<<< HEAD
 import multipart from '@fastify/multipart';
+=======
+>>>>>>> 9a5dbee8869f8e6e66708a9673d856b8c78f72d1
 
 import { authenticationRoutes } from './routes/authentication';
 import { exercisesRoutes } from './routes/exercises';
