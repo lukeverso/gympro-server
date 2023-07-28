@@ -72,7 +72,7 @@ export async function uploadRoutes(fastify: FastifyInstance) {
                });
 
                const { id } = paramsSchema.parse(request.params);
-               
+
                const upload = await request.file({
                     limits: {
                          fileSize: 10_485_760 // 10mb
