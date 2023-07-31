@@ -140,7 +140,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
      }, async (request, reply) => {
           try {
                const requestParams = z.object({
-                    id: z.string()
+                    id: z.string().uuid()
                });
 
                const { id } = requestParams.parse(request.params);
@@ -198,7 +198,7 @@ export async function teachersRoutes(fastify: FastifyInstance) {
      }, async (request, reply) => {
           try {
                const requestParams = z.object({
-                    id: z.string()
+                    id: z.string().uuid()
                });
 
                const { id } = requestParams.parse(request.params);

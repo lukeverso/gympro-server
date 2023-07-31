@@ -8,7 +8,7 @@ export async function workoutsRoutes(fastify: FastifyInstance) {
           preHandler: authenticate
      }, async (request, reply) => {
           const paramsSchema = z.object({
-               id: z.string()
+               id: z.string().uuid()
           });
 
           const { id } = paramsSchema.parse(request.params);

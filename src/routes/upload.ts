@@ -1,128 +1,121 @@
 import { FastifyInstance } from 'fastify';
-import { prisma } from '../lib/prisma';
-import { authenticate } from '../plugins/authenticate';
-import cloudinary from 'cloudinary';
+import multer from 'fastify-multer';
 import { z } from 'zod';
 
-cloudinary.v2.config({
-     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-     api_key: process.env.CLOUDINARY_API_KEY,
-     api_secret: process.env.CLOUDINARY_API_SECRET
-});
+import { prisma } from '../lib/prisma';
+import { authenticate } from '../plugins/authenticate';
+import { uploadPicture } from '../lib/upload';
+
+const upload = multer();
+
+interface ResultProps {
+     url?: string;
+}
 
 export async function uploadRoutes(fastify: FastifyInstance) {
+     fastify.addHook('onRequest', authenticate);
+
      fastify.post('/students/:id/upload', {
-          preHandler: authenticate
+          preHandler: upload.single('file')
      }, async (request, reply) => {
           try {
                const paramsSchema = z.object({
-                    id: z.string()
+                    id: z.string().uuid()
                });
 
                const { id } = paramsSchema.parse(request.params);
 
-               const upload = await request.file({
-                    limits: {
-                         fileSize: 10_485_760 // 10mb
+               const teacher = prisma.students.findUnique({
+                    where: {
+                         id
                     }
                });
 
-               if (!upload) return reply.status(400).send('No file uploaded.');
+               if (!teacher) {
+                    return reply.status(400).send({
+                         status: 'error',
+                         message: 'Ocorreu um erro ao atualizar a foto.'
+                    });
+               };
 
-               const mimeTypeRegex = /^(image)\/[a-zA-Z]+/;
-               const isValidFileFormat = mimeTypeRegex.test(upload.mimetype);
+               const binaryData = request.file?.buffer;
 
-               if (!isValidFileFormat) return reply.status(400).send('Invalid file format.');
+               const result: ResultProps = await uploadPicture(binaryData);
 
-               const data = new Date().getTime();
-               const filename = `${data}-${upload.filename}`;
-               const fileBuffer = await upload.toBuffer();
-
-               // Wrap the cloudinary.v2.uploader.upload_stream() in a Promise
-               const cloudUpload: any = await new Promise((resolve, reject) => {
-                    cloudinary.v2.uploader.upload_stream(
-                         { public_id: filename, folder: 'profiles' },
-                         (error: any, result: any) => {
-                              if (error) {
-                                   console.log(error);
-                                   reject('An error occurred while uploading the file.');
-                              } else {
-                                   resolve(result);
-                              }
+               if (result && result.url) {
+                    await prisma.students.update({
+                         where: {
+                              id
+                         },
+                         data: {
+                              picture: result.url
                          }
-                    ).end(fileBuffer);
-               });
+                    });
 
-               console.log(cloudUpload);
-
-               return reply.status(200).send({
-                    success: true,
-                    file: cloudUpload.secure_url,
-               });
+                    return reply.status(200).send({
+                         status: 'success',
+                         message: 'Foto atualizada com sucesso.'
+                    });
+               } else {
+                    return reply.status(400).send({
+                         status: 'error',
+                         message: 'Ocorreu um erro ao atualizar a foto.'
+                    });
+               };
           } catch (error) {
                console.log(error);
-               return reply.status(500).send('An error occurred while uploading the file.');
           };
      });
 
-     fastify.post('/teachers/:id/upload', async (request, reply) => {
+     fastify.post('/teachers/:id/upload', {
+          preHandler: upload.single('file')
+     }, async (request, reply) => {
           try {
                const paramsSchema = z.object({
-                    id: z.string()
+                    id: z.string().uuid()
                });
 
                const { id } = paramsSchema.parse(request.params);
 
-               const upload = await request.file({
-                    limits: {
-                         fileSize: 10_485_760 // 10mb
-                    }
-               });
-
-               if (!upload) return reply.status(400).send('No file uploaded.');
-
-               const mimeTypeRegex = /^(image)\/[a-zA-Z]+/;
-               const isValidFileFormat = mimeTypeRegex.test(upload.mimetype);
-
-               if (!isValidFileFormat) return reply.status(400).send('Invalid file format.');
-
-               const data = new Date().getTime();
-               const filename = `${data}-${upload.filename}`;
-               const fileBuffer = await upload.toBuffer();
-
-               // Wrap the cloudinary.v2.uploader.upload_stream() in a Promise
-               const cloudUpload: any = await new Promise((resolve, reject) => {
-                    cloudinary.v2.uploader.upload_stream(
-                         { public_id: filename, folder: 'profiles' },
-                         (error: any, result: any) => {
-                              if (error) {
-                                   console.log(error);
-                                   reject('An error occurred while uploading the file.');
-                              } else {
-                                   resolve(result);
-                              }
-                         }
-                    ).end(fileBuffer);
-               });
-
-               console.log(cloudUpload);
-
-               await prisma.teachers.update({
+               const teacher = prisma.teachers.findUnique({
                     where: {
                          id
-                    },
-                    data: {
-                         picture: cloudUpload.secure_url
                     }
                });
 
-               return reply.status(200).send({
-                    status: 'success',
-                    message: 'Foto de perfil alterada com sucesso.'
-               });
+               if (!teacher) {
+                    return reply.status(400).send({
+                         status: 'error',
+                         message: 'Ocorreu um erro ao atualizar a foto.'
+                    });
+               };
+
+               const binaryData = request.file?.buffer;
+
+               const result: ResultProps = await uploadPicture(binaryData);
+
+               if (result && result.url) {
+                    await prisma.teachers.update({
+                         where: {
+                              id
+                         },
+                         data: {
+                              picture: result.url
+                         }
+                    });
+
+                    return reply.status(200).send({
+                         status: 'success',
+                         message: 'Foto atualizada com sucesso.'
+                    });
+               } else {
+                    return reply.status(400).send({
+                         status: 'error',
+                         message: 'Ocorreu um erro ao atualizar a foto.'
+                    });
+               };
           } catch (error) {
                console.log(error);
-               return reply.status(500).send('An error occurred while uploading the file.');
           };
      });
 };

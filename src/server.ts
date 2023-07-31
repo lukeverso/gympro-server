@@ -11,9 +11,7 @@ import { studentsRoutes } from './routes/students';
 import { workoutsRoutes } from './routes/workouts';
 import { notificationsRoutes } from './routes/notifications';
 import { uploadRoutes } from './routes/upload';
-import { uploadPicture } from './lib/upload';
-
-const upload = multer();
+import { sheetsRoutes } from './routes/sheets';
 
 const fastify = Fastify();
 
@@ -35,16 +33,7 @@ fastify.register(studentsRoutes);
 fastify.register(workoutsRoutes);
 fastify.register(notificationsRoutes);
 fastify.register(uploadRoutes);
-
-fastify.post('/teachers/upload', {
-     preHandler: upload.single('file')
-}, async (request, reply) => {
-     const binaryData = (request.file as any).buffer;
-
-     const result = await uploadPicture(binaryData);
-
-     return result;
-});
+fastify.register(sheetsRoutes);
 
 fastify
      .listen({

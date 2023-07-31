@@ -25,6 +25,7 @@
      "devDependencies": {
           "@mermaid-js/mermaid-cli": "^10.2.2",
           "@types/bcrypt": "^5.0.0",
+          "@types/multer": "^1.4.7",
           "@types/node": "^20.3.1",
           "prisma": "^5.0.0",
           "tsx": "^3.12.7",
