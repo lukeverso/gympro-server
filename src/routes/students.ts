@@ -212,18 +212,18 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
      // LISTA OS DETALHES DE UM ALUNO
      fastify.get('/students/:id/details', {
-          preHandler: authenticate
+          preHandler: authenticate,
      }, async (request, reply) => {
           try {
                const requestParams = z.object({
-                    id: z.string().uuid()
+                    id: z.string().uuid(),
                });
 
                const { id } = requestParams.parse(request.params);
 
                const details = await prisma.students.findUnique({
                     where: {
-                         id
+                         id,
                     },
                     select: {
                          id: true,
@@ -235,6 +235,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                          status: true,
                          sheets: {
                               select: {
+                                   id: true,
                                    annotations: true,
                                    active: true,
                                    objective: true,
@@ -244,18 +245,25 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                                         select: {
                                              id: true,
                                              focus: true,
-                                             type: true
-                                        }
-                                   }
-                              }
-                         }
-                    }
+                                             type: true,
+                                        },
+                                   },
+                              },
+                              orderBy: {
+                                   startDate: 'desc', // Ordenar por data de início em ordem decrescente (última folha primeiro)
+                              },
+                              take: 1, // Limitar a seleção para retornar apenas 1 folha
+                              where: {
+                                   active: true, // Selecionar apenas folhas ativas (active = true)
+                              },
+                         },
+                    },
                });
 
                if (!details) {
                     return reply.status(404).send({
                          status: 'error',
-                         message: 'Student not found.'
+                         message: 'Student not found.',
                     });
                }
 
@@ -263,7 +271,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                const studentDetails = {
                     ...details,
-                    age
+                    age,
                };
 
                return reply.status(200).send(studentDetails);
@@ -272,7 +280,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
 
                return reply.status(500).send({
                     status: 'error',
-                    message: `Ocorreu um erro: ${error}`
+                    message: `Ocorreu um erro: ${error}`,
                });
           }
      });
@@ -298,7 +306,7 @@ export async function studentsRoutes(fastify: FastifyInstance) {
                     status: 'error',
                     message: 'student not found.'
                });
-               
+
                const status = !student.status;
 
                await prisma.students.update({

@@ -130,7 +130,7 @@ model Measures {
 
 model Sheets {
      id          String  @id @default(uuid())
-     studentsId  String  @unique
+     studentsId  String
      annotations String?
      objective   String
      startDate   String
@@ -145,8 +145,8 @@ model Sheets {
 }
 
 model Workouts {
-     id       String  @id @default(uuid())
-     sheetsId String?
+     id       String @id @default(uuid())
+     sheetsId String
 
      type   String
      focus  String
@@ -157,12 +157,12 @@ model Workouts {
 
      exercises Exercises[]
 
-     sheet Sheets? @relation(fields: [sheetsId], references: [id])
+     sheet Sheets @relation(fields: [sheetsId], references: [id])
 }
 
 model Exercises {
      id         String @id @default(uuid())
-     exerciseId String
+     workoutsId String
 
      name        String
      series      Int
@@ -175,5 +175,5 @@ model Exercises {
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 
-     exercise Workouts @relation(fields: [exerciseId], references: [id])
+     Workouts Workouts @relation(fields: [workoutsId], references: [id])
 }

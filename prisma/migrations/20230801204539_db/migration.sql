@@ -7,6 +7,7 @@ CREATE TABLE "Students" (
     "birthdate" TEXT NOT NULL,
     "telephone" TEXT,
     "status" BOOLEAN NOT NULL,
+    "picture" TEXT,
     "code" TEXT NOT NULL,
     "street" TEXT NOT NULL,
     "number" TEXT NOT NULL,
@@ -32,6 +33,7 @@ CREATE TABLE "Teachers" (
     "birthdate" TEXT NOT NULL,
     "telephone" TEXT,
     "status" BOOLEAN NOT NULL,
+    "picture" TEXT,
     "code" TEXT NOT NULL,
     "street" TEXT NOT NULL,
     "number" TEXT NOT NULL,
@@ -111,19 +113,19 @@ CREATE TABLE "Sheets" (
 -- CreateTable
 CREATE TABLE "Workouts" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "sheetsId" TEXT,
+    "sheetsId" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     "focus" TEXT NOT NULL,
     "active" BOOLEAN NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "Workouts_sheetsId_fkey" FOREIGN KEY ("sheetsId") REFERENCES "Sheets" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    CONSTRAINT "Workouts_sheetsId_fkey" FOREIGN KEY ("sheetsId") REFERENCES "Sheets" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
 CREATE TABLE "Exercises" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "exerciseId" TEXT NOT NULL,
+    "workoutsId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "series" INTEGER NOT NULL,
     "repetitions" INTEGER NOT NULL,
@@ -133,7 +135,7 @@ CREATE TABLE "Exercises" (
     "finished" BOOLEAN NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "Exercises_exerciseId_fkey" FOREIGN KEY ("exerciseId") REFERENCES "Workouts" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT "Exercises_workoutsId_fkey" FOREIGN KEY ("workoutsId") REFERENCES "Workouts" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateIndex
@@ -144,6 +146,3 @@ CREATE UNIQUE INDEX "Teachers_email_key" ON "Teachers"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Gyms_email_key" ON "Gyms"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Sheets_studentsId_key" ON "Sheets"("studentsId");
