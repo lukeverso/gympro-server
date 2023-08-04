@@ -102,4 +102,33 @@ export async function workoutsRoutes(fastify: FastifyInstance) {
           };
      });
 
+     fastify.delete('/workouts/:id/delete', {
+          preHandler: authenticate,
+     }, async (request, reply) => {
+          try {
+               const paramsSchema = z.object({
+                    id: z.string().uuid()
+               });
+
+               const { id } = paramsSchema.parse(request.params);
+
+               await prisma.workouts.delete({
+                    where: {
+                         id
+                    }
+               });
+
+               return reply.status(200).send({
+                    status: 'success',
+                    message: 'Exercise deleted successfully.'
+               });
+          } catch (error) {
+               console.log(error);
+
+               return reply.status(500).send({
+                    status: 'error',
+                    message: `An error occurred: ${error}`,
+               });
+          }
+     });
 };

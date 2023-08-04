@@ -165,12 +165,11 @@ model Exercises {
      workoutsId String
 
      name        String
-     series      Int
-     repetitions Int
-     restTime    Int
+     series      String
+     repetitions String
+     restTime    String
      weight      String?
      annotations String?
-     finished    Boolean
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
