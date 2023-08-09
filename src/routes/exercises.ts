@@ -193,6 +193,6 @@ export async function exercisesRoutes(fastify: FastifyInstance) {
                     status: 'error',
                     message: `An error occurred: ${error}`,
                });
-          }
+          };
      });
 };

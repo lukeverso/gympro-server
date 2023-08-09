@@ -29,41 +29,6 @@ function calculateAge(birthdate: string) {
 };
 
 export async function studentsRoutes(fastify: FastifyInstance) {
-     // VERIFICAR DISPONIBILIDADE DE E-MAIL PARA ALUNOS
-     fastify.post('/students/verify-email', async (request, reply) => {
-          try {
-               const querySchema = z.object({
-                    email: z.string().email()
-               });
-
-               const { email } = querySchema.parse(request.query);
-
-               const student = await prisma.students.findUnique({
-                    where: {
-                         email
-                    }
-               });
-
-               if (student?.email === email) {
-                    return reply.status(200).send({
-                         status: 'error',
-                         message: 'Este e-mail está em uso.'
-                    });
-               };
-
-               return reply.status(200).send({
-                    status: 'success',
-                    message: 'E-mail não utilizado.'
-               });
-          } catch (error) {
-               console.error(error);
-               return reply.status(500).send({
-                    status: 'error',
-                    message: 'Erro interno do servidor.'
-               });
-          }
-     });
-
      // CRIAR UM ALUNO
      fastify.post('/students', async (request, reply) => {
           try {

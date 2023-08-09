@@ -176,3 +176,13 @@ model Exercises {
 
      Workouts Workouts @relation(fields: [workoutsId], references: [id])
 }
+
+model VerificationCode {
+     id String @id @default(uuid())
+
+     email String @unique
+     code  String
+
+     createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
+}

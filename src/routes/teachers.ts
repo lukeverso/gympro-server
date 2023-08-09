@@ -29,41 +29,6 @@ function calculateAge(birthdate: string) {
 };
 
 export async function teachersRoutes(fastify: FastifyInstance) {
-     // VERIFICAR DISPONIBILIDADE DE E-MAIL PARA PROFESSORES
-     fastify.post('/teachers/verify-email', async (request, reply) => {
-          try {
-               const querySchema = z.object({
-                    email: z.string().email()
-               });
-
-               const { email } = querySchema.parse(request.query);
-
-               const teacher = await prisma.teachers.findUnique({
-                    where: {
-                         email
-                    }
-               });
-
-               if (teacher?.email === email) {
-                    return reply.status(200).send({
-                         status: 'error',
-                         message: 'Este e-mail está em uso.'
-                    });
-               };
-
-               return reply.status(200).send({
-                    status: 'success',
-                    message: 'E-mail não utilizado.'
-               });
-          } catch (error) {
-               console.error(error);
-               return reply.status(500).send({
-                    status: 'error',
-                    message: 'Erro interno do servidor.'
-               });
-          }
-     });
-
      // CRIAR UM PROFESSOR
      fastify.post('/teachers', async (request, reply) => {
           try {
