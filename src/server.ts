@@ -1,44 +1,17 @@
-import Fastify from 'fastify';
-import cors from '@fastify/cors';
-import jwt from '@fastify/jwt';
-import multer from 'fastify-multer';
+import express from 'express';
+import cors from 'cors';
+import { router } from './routes';
 
-import { authenticationRoutes } from './routes/authentication';
-import { exercisesRoutes } from './routes/exercises';
-import { measuresRoutes } from './routes/measures';
-import { teachersRoutes } from './routes/teachers';
-import { studentsRoutes } from './routes/students';
-import { workoutsRoutes } from './routes/workouts';
-import { notificationsRoutes } from './routes/notifications';
-import { uploadRoutes } from './routes/upload';
-import { sheetsRoutes } from './routes/sheets';
+const server = express();
 
-const fastify = Fastify();
-
-fastify.register(multer.contentParser);
-
-fastify.register(cors, {
+server.use(cors({
      origin: true
+}));
+
+server.use(express.json());
+
+server.use(router);
+
+server.listen(3333, '0.0.0.0', () => {
+     console.log(`Server running at http://localhost:3333`);
 });
-
-fastify.register(jwt, {
-     secret: 'gymprosystem'
-});
-
-fastify.register(authenticationRoutes);
-fastify.register(exercisesRoutes);
-fastify.register(measuresRoutes);
-fastify.register(teachersRoutes);
-fastify.register(studentsRoutes);
-fastify.register(workoutsRoutes);
-fastify.register(notificationsRoutes);
-fastify.register(uploadRoutes);
-fastify.register(sheetsRoutes);
-
-fastify
-     .listen({
-          port: 3333,
-          host: '0.0.0.0',
-     }).then(() => {
-          console.log('Server running at http://localhost:3333');
-     });

@@ -137,6 +137,15 @@ CREATE TABLE "Exercises" (
     CONSTRAINT "Exercises_workoutsId_fkey" FOREIGN KEY ("workoutsId") REFERENCES "Workouts" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+-- CreateTable
+CREATE TABLE "VerificationCodes" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "email" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Students_email_key" ON "Students"("email");
 
@@ -145,3 +154,6 @@ CREATE UNIQUE INDEX "Teachers_email_key" ON "Teachers"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Gyms_email_key" ON "Gyms"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "VerificationCodes_email_key" ON "VerificationCodes"("email");
