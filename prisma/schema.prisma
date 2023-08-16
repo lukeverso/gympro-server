@@ -33,10 +33,10 @@ model Students {
      updatedAt DateTime @updatedAt
 
      teacher Teachers? @relation(fields: [teacherId], references: [id])
-     gym     Gyms?     @relation(fields: [gymId], references: [id])
 
-     measures Measures[]
-     sheets   Sheets[]
+     measures       Measures[]
+     sheets         Sheets[]
+     medicalHistory MedicalHistory[]
 }
 
 model Teachers {
@@ -62,31 +62,7 @@ model Teachers {
 
      gymId String?
 
-     gym Gyms? @relation(fields: [gymId], references: [id])
-
      students Students[]
-}
-
-model Gyms {
-     id       String @id @default(uuid())
-     name     String
-     email    String @unique
-     password String
-
-     code       String
-     street     String
-     number     String
-     complement String?
-     district   String
-     city       String
-     state      String
-
-     createdAt DateTime @default(now())
-     updatedAt DateTime @updatedAt
-
-     teachers      Teachers[]
-     notifications Notifications[]
-     students      Students[]
 }
 
 model Notifications {
@@ -99,8 +75,6 @@ model Notifications {
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
-
-     gym Gyms? @relation(fields: [gymId], references: [id])
 }
 
 model Measures {
@@ -182,4 +156,40 @@ model VerificationCodes {
 
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
+}
+
+model MedicalHistory {
+     id String @id @default(uuid())
+     studentsId String
+
+     surgicalHistory Boolean
+     oncologicalHistory Boolean
+     hypertension Boolean
+     hypotension Boolean
+     diabetes Boolean
+     epilepsy Boolean
+     smoker Boolean
+     drinker Boolean
+     stressTest Boolean
+     sleepHours Int
+     lifeStyle String
+     timeWithoutTraining Int
+     
+     heartProblem Boolean
+     chestPain Boolean
+     chestPainLastMonth Boolean
+     imbalance Boolean
+     boneJointIssue Boolean
+     medication Boolean
+     reasonForNotExercising Boolean
+
+     neckPain Boolean
+     shoulderPain Boolean
+     backPain Boolean
+     wristPain Boolean
+     fingerPain Boolean
+     hipPain Boolean
+     kneePain Boolean
+
+     student Students @relation(fields: [studentsId], references: [id])
 }

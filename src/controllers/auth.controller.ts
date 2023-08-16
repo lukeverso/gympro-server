@@ -3,6 +3,7 @@ import { prisma } from '../lib/prisma';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
 
 function generateRandomString(length: number) {
      let result = '';
@@ -150,6 +151,24 @@ export async function verifyMailForStudent(request: Request, response: Response)
                     code,
                     email
                }
+          });
+
+          const transport = nodemailer.createTransport({
+               host: 'smtp-relay.brevo.com',
+               port: 587,
+               auth: {
+                    user: 'cristhovamlucas@gmail.com',
+                    pass: 'FcvrRdD28JPCbwLs'
+               }
+          });
+
+          const html = ``;
+
+          transport.sendMail({
+               to: email,
+               from: 'cristhovamlucas@gmail.com',
+               subject: 'Código de autorização',
+               text: `Seu código de autorização é o ${code}`
           });
 
           return response.status(200).send({

@@ -20,8 +20,7 @@ CREATE TABLE "Students" (
     "measuresId" TEXT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "Students_teacherId_fkey" FOREIGN KEY ("teacherId") REFERENCES "Teachers" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT "Students_gymId_fkey" FOREIGN KEY ("gymId") REFERENCES "Gyms" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    CONSTRAINT "Students_teacherId_fkey" FOREIGN KEY ("teacherId") REFERENCES "Teachers" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -43,25 +42,7 @@ CREATE TABLE "Teachers" (
     "state" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
-    "gymId" TEXT,
-    CONSTRAINT "Teachers_gymId_fkey" FOREIGN KEY ("gymId") REFERENCES "Gyms" ("id") ON DELETE SET NULL ON UPDATE CASCADE
-);
-
--- CreateTable
-CREATE TABLE "Gyms" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "name" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
-    "code" TEXT NOT NULL,
-    "street" TEXT NOT NULL,
-    "number" TEXT NOT NULL,
-    "complement" TEXT,
-    "district" TEXT NOT NULL,
-    "city" TEXT NOT NULL,
-    "state" TEXT NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "gymId" TEXT
 );
 
 -- CreateTable
@@ -72,8 +53,7 @@ CREATE TABLE "Notifications" (
     "content" TEXT NOT NULL,
     "expanded" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "Notifications_gymId_fkey" FOREIGN KEY ("gymId") REFERENCES "Gyms" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    "updatedAt" DATETIME NOT NULL
 );
 
 -- CreateTable
@@ -146,14 +126,44 @@ CREATE TABLE "VerificationCodes" (
     "updatedAt" DATETIME NOT NULL
 );
 
+-- CreateTable
+CREATE TABLE "MedicalHistory" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "studentsId" TEXT NOT NULL,
+    "surgicalHistory" BOOLEAN NOT NULL,
+    "oncologicalHistory" BOOLEAN NOT NULL,
+    "hypertension" BOOLEAN NOT NULL,
+    "hypotension" BOOLEAN NOT NULL,
+    "diabetes" BOOLEAN NOT NULL,
+    "epilepsy" BOOLEAN NOT NULL,
+    "smoker" BOOLEAN NOT NULL,
+    "drinker" BOOLEAN NOT NULL,
+    "stressTest" BOOLEAN NOT NULL,
+    "sleepHours" INTEGER NOT NULL,
+    "lifeStyle" TEXT NOT NULL,
+    "timeWithoutTraining" INTEGER NOT NULL,
+    "heartProblem" BOOLEAN NOT NULL,
+    "chestPain" BOOLEAN NOT NULL,
+    "chestPainLastMonth" BOOLEAN NOT NULL,
+    "imbalance" BOOLEAN NOT NULL,
+    "boneJointIssue" BOOLEAN NOT NULL,
+    "medication" BOOLEAN NOT NULL,
+    "reasonForNotExercising" BOOLEAN NOT NULL,
+    "neckPain" BOOLEAN NOT NULL,
+    "shoulderPain" BOOLEAN NOT NULL,
+    "backPain" BOOLEAN NOT NULL,
+    "wristPain" BOOLEAN NOT NULL,
+    "fingerPain" BOOLEAN NOT NULL,
+    "hipPain" BOOLEAN NOT NULL,
+    "kneePain" BOOLEAN NOT NULL,
+    CONSTRAINT "MedicalHistory_studentsId_fkey" FOREIGN KEY ("studentsId") REFERENCES "Students" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Students_email_key" ON "Students"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Teachers_email_key" ON "Teachers"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Gyms_email_key" ON "Gyms"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "VerificationCodes_email_key" ON "VerificationCodes"("email");

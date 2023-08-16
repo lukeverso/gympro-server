@@ -14,23 +14,6 @@ export async function getStudentNotifications(request: Request, response: Respon
                where: {
                     id
                },
-               select: {
-                    gym: {
-                         select: {
-                              notifications: {
-                                   select: {
-                                        id: true,
-                                        title: true,
-                                        expanded: true,
-                                        content: true
-                                   },
-                                   orderBy: {
-                                        createdAt: 'desc'
-                                   }
-                              }
-                         }
-                    }
-               }
           });
 
           return response.status(200).send({ notifications });
