@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { loginStudent, loginTeacher, verifyMailForStudent } from '../controllers/auth.controller';
+import { confirmVerificationCode, loginStudent, loginTeacher, verifyMailForStudent, verifyMailForTeacher } from '../controllers/auth.controller';
 import { createExercise } from '../controllers/exercises.controller';
 import { createSheet } from '../controllers/sheets.controller';
 import { createStudent } from '../controllers/students.controller';
@@ -12,8 +12,10 @@ const postRoutes = Router();
 
 // From AUTH
 postRoutes.post('/students/login', loginStudent);
-postRoutes.post('/teachers/login', loginTeacher);
 postRoutes.post('/students/verify-email', verifyMailForStudent);
+postRoutes.post('/teachers/login', loginTeacher);
+postRoutes.post('/teachers/verify-email', verifyMailForTeacher);
+postRoutes.post('/verify-code', confirmVerificationCode);
 
 // From EXERCISES
 postRoutes.post('/exercises', createExercise);

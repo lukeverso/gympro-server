@@ -5,10 +5,10 @@ import { z } from 'zod';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 
-function generateRandomString(length: number) {
+function generateRandomCode(length: number) {
      let result = '';
 
-     const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+     const characters = '0123456789';
      const charactersLength = characters.length;
 
      for (let i = 0; i < length; i++) {
@@ -129,7 +129,7 @@ export async function verifyMailForStudent(request: Request, response: Response)
      });
 
      const { email } = bodySchema.parse(request.body);
-     
+
      try {
           const student = await prisma.students.findUnique({
                where: {
@@ -144,11 +144,17 @@ export async function verifyMailForStudent(request: Request, response: Response)
                });
           };
 
-          const code = generateRandomString(6);
+          const code = generateRandomCode(6);
 
-          await prisma.verificationCodes.create({
-               data: {
+          await prisma.verificationCodes.upsert({
+               create: {
                     code,
+                    email
+               },
+               update: {
+                    code
+               },
+               where: {
                     email
                }
           });
@@ -162,13 +168,74 @@ export async function verifyMailForStudent(request: Request, response: Response)
                }
           });
 
-          const html = ``;
+          const html = `<!DOCTYPE html>
+          <html lang="pt-br">          
+               <head>
+                    <meta charset="utf-8">
+                    <link rel="icon" href="/favicon.ico">
+                    <link rel="preconnect" href="https://fonts.googleapis.com">
+                    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+                    <style>
+                         * {
+                              font-family: 'Roboto', sans-serif;
+                         }
+
+                         body {
+                              background: #EAEAEA;
+                         }
+
+                         .container {
+                              width: 60%;
+                              margin: 0 auto;
+                              padding: 50px 70px;
+                              background: #FFFFFF;
+                              text-align: center;
+                              display: block;
+                         }
+                         
+                         .logo {
+                              font-size: 32px;
+                         }
+                         
+                         .text {
+                              margin-bottom: 50px;
+                              font-size: 20px;
+                         }
+
+                         .code {
+                              font-size: 24px;
+                              font-weight: 700;
+                              padding: 10px 30px;
+                              background: #EAEAEA;
+                         }
+
+                         .warning {
+                              margin-top: 50px;
+                              font-size: 12px;
+                         }
+                    </style>
+               </head>
+               <body>
+                    <div class="container">
+                         <p class="logo">Gym<strong>Pro</strong></p>
+                         <h1 class="title">Olá!</h1>
+                         <p class="text">
+                              Use o código informado neste e-mail para autorizar o acesso à sua conta no app Gym<strong>Pro</strong>:
+                         </p>
+                         <span class="code">${code}</span>
+                         <p class="warning">
+                              Caso não esteja criando uma conta no <strong>GymPro</strong>, desconsidere este e-mail.<br/>
+                         </p>
+                    </div>
+               </body>
+          </html>`;
 
           transport.sendMail({
                to: email,
                from: 'cristhovamlucas@gmail.com',
                subject: 'Código de autorização',
-               text: `Seu código de autorização é o ${code}`
+               html: html
           });
 
           return response.status(200).send({
@@ -191,7 +258,7 @@ export async function verifyMailForTeacher(request: Request, response: Response)
      });
 
      const { email } = bodySchema.parse(request.body);
-     
+
      try {
           const teacher = await prisma.teachers.findUnique({
                where: {
@@ -200,37 +267,97 @@ export async function verifyMailForTeacher(request: Request, response: Response)
           });
 
           if (teacher?.email === email) {
-               return response.status(200).send({
+               return response.status(400).send({
                     status: 'error',
                     message: 'Este e-mail está em uso.'
                });
           };
 
-          const code = generateRandomString(6);
+          const code = generateRandomCode(6);
 
-          const emailExists = await prisma.verificationCodes.findUnique({
+          await prisma.verificationCodes.upsert({
+               create: {
+                    code,
+                    email
+               },
+               update: {
+                    code
+               },
                where: {
                     email
                }
           });
 
-          if (emailExists) {
-               await prisma.verificationCodes.update({
-                    where: {
-                         email
-                    },
-                    data: {
-                         code
-                    }
-               });
-          } else {
-               await prisma.verificationCodes.create({
-                    data: {
-                         code,
-                         email
-                    }
-               });
-          };
+          const transport = nodemailer.createTransport({
+               host: 'smtp-relay.brevo.com',
+               port: 587,
+               auth: {
+                    user: 'cristhovamlucas@gmail.com',
+                    pass: 'FcvrRdD28JPCbwLs'
+               }
+          });
+
+          const html = `<!DOCTYPE html>
+          <html lang="pt-br">          
+               <head>
+                    <meta charset="utf-8">
+                    <link rel="icon" href="/favicon.ico">
+                    <link rel="preconnect" href="https://fonts.googleapis.com">
+                    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+                    <style>
+                         * {
+                              font-family: 'Roboto', sans-serif;
+                         }
+
+                         body {
+                              background: #EAEAEA;
+                         }
+                         
+                         .logo {
+                              width: 25%;
+                              margin: 0 auto;
+                         }
+                         
+                         .text {
+                              margin-bottom: 50px;
+                              font-size: 20px;
+                         }
+
+                         .code {
+                              font-size: 24px;
+                              font-weight: 700;
+                              padding: 10px 30px;
+                              background: #EAEAEA;
+                         }
+
+                         .warning {
+                              margin-top: 50px;
+                              font-size: 12px;
+                         }
+                    </style>
+               </head>
+               <body>
+                    <div class="container">
+                         <p class="logo">Gym<strong>Pro</strong></p>
+                         <h1 class="title">Olá!</h1>
+                         <p class="text">
+                              Use o código informado neste e-mail para autorizar o acesso à sua conta no app Gym<strong>Pro</strong>:
+                         </p>
+                         <span class="code">${code}</span>
+                         <p class="warning">
+                              Caso não esteja criando uma conta no <strong>GymPro</strong>, desconsidere este e-mail.<br/>
+                         </p>
+                    </div>
+               </body>
+          </html>`;
+
+          transport.sendMail({
+               to: email,
+               from: 'cristhovamlucas@gmail.com',
+               subject: 'Código de autorização',
+               html: html
+          });
 
           return response.status(200).send({
                status: 'success',
@@ -258,22 +385,31 @@ export async function confirmVerificationCode(request: Request, response: Respon
           const emailExists = await prisma.verificationCodes.findUnique({
                where: {
                     email
+               },
+               select: {
+                    email: true,
+                    code: true
                }
           });
 
           if (emailExists) {
-               const checkCode = await prisma.verificationCodes.findUnique({
-                    where: {
-                         email
-                    },
-                    select: {
-                         code: true
-                    }
-               });
+               if (code === emailExists.code) {
+                    await prisma.verificationCodes.delete({
+                         where: {
+                              email
+                         }
+                    });
 
-               // if (checkCode === code) {
-
-               // };
+                    return response.status(200).send({
+                         status: 'success',
+                         message: 'Código verificado com sucesso.'
+                    });
+               } else {
+                    return response.status(400).send({
+                         status: 'error',
+                         message: 'Código incorreto...'
+                    });
+               };
           };
      } catch (error) {
           console.log(error);
