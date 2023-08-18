@@ -137,7 +137,13 @@ export async function verifyMailForStudent(request: Request, response: Response)
                }
           });
 
-          if (student?.email === email) {
+          const teacher = await prisma.teachers.findUnique({
+               where: {
+                    email
+               }
+          });
+
+          if (student?.email === email || teacher?.email === email) {
                return response.status(200).send({
                     status: 'error',
                     message: 'Este e-mail está em uso.'
@@ -233,7 +239,7 @@ export async function verifyMailForStudent(request: Request, response: Response)
 
           transport.sendMail({
                to: email,
-               from: 'cristhovamlucas@gmail.com',
+               from: 'contatogymproapp@gmail.com',
                subject: 'Código de autorização',
                html: html
           });
@@ -266,7 +272,13 @@ export async function verifyMailForTeacher(request: Request, response: Response)
                }
           });
 
-          if (teacher?.email === email) {
+          const student = await prisma.students.findUnique({
+               where: {
+                    email
+               }
+          });
+
+          if (teacher?.email === email || student?.email === email) {
                return response.status(400).send({
                     status: 'error',
                     message: 'Este e-mail está em uso.'
@@ -292,7 +304,7 @@ export async function verifyMailForTeacher(request: Request, response: Response)
                host: 'smtp-relay.brevo.com',
                port: 587,
                auth: {
-                    user: 'cristhovamlucas@gmail.com',
+                    user: 'contatogymproapp@gmail.com',
                     pass: 'FcvrRdD28JPCbwLs'
                }
           });
@@ -354,7 +366,7 @@ export async function verifyMailForTeacher(request: Request, response: Response)
 
           transport.sendMail({
                to: email,
-               from: 'cristhovamlucas@gmail.com',
+               from: 'contatogymproapp@gmail.com',
                subject: 'Código de autorização',
                html: html
           });

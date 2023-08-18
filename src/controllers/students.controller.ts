@@ -97,6 +97,9 @@ export async function getStudentData(request: Request, response: Response) {
                },
                select: {
                     name: true,
+                    telephone: true,
+                    email: true,
+                    picture: true,
                     teacher: {
                          select: {
                               name: true,
@@ -605,7 +608,7 @@ export async function getStudentAddress(request: Request, response: Response) {
                message: 'student not found.'
           });
 
-          return response.status(200).send({ student });
+          return response.status(200).send(student);
      } catch (error) {
           console.log(error);
 

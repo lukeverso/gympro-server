@@ -16,7 +16,7 @@ export async function getStudentNotifications(request: Request, response: Respon
                },
           });
 
-          return response.status(200).send({ notifications });
+          return response.status(200).send(notifications);
      } catch (error) {
           console.log(error);
 

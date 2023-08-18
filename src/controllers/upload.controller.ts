@@ -17,26 +17,28 @@ export async function uploadStudentPicture(request: Request, response: Response)
 
      const { id } = paramsSchema.parse(request.params);
 
+     console.log(request);
+
      try {
-          const teacher = await prisma.students.findUnique({
+          const student = await prisma.students.findUnique({
                where: {
                     id
                }
           });
 
-          if (!teacher) {
+          if (!student) {
                return response.status(400).send({
                     status: 'error',
                     message: 'Ocorreu um erro ao atualizar a foto.'
                });
-          }
+          };
 
           if (!request.file) {
                return response.status(400).send({
                     status: 'error',
                     message: 'Nenhum arquivo de imagem foi enviado.'
                });
-          }
+          };
 
           const binaryData = request.file.buffer;
 
