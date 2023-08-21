@@ -16,6 +16,7 @@ getRoutes.get('/notifications/:id', verifyToken, getStudentNotifications);
 
 // From STUDENTS
 getRoutes.get('/students/:id', verifyToken, getStudentData);
+getRoutes.get('/students/:id/details', verifyToken, getStudentDetails);
 getRoutes.get('/students/:email/search', verifyToken, findStudentByMail);
 getRoutes.get('/students/:id/name', verifyToken, getStudentName);
 getRoutes.get('/students/:id/email', verifyToken, getStudentEmail);

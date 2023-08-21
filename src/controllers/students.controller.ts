@@ -103,9 +103,9 @@ export async function getStudentData(request: Request, response: Response) {
                     teacher: {
                          select: {
                               name: true,
-                              birthdate: true,
                               email: true,
-                              telephone: true
+                              telephone: true,
+                              picture: true
                          }
                     },
                     sheets: {

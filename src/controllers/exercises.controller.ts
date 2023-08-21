@@ -10,18 +10,24 @@ export async function getStudentExercises(request: Request, response: Response) 
      const { id } = params.parse(request.params);
 
      try {
-          const exercises = await prisma.exercises.findUnique({
+          const exercises = await prisma.workouts.findUnique({
                where: {
                     id
                },
                select: {
-                    id: true,
-                    annotations: true,
-                    name: true,
-                    repetitions: true,
-                    restTime: true,
-                    series: true,
-                    weight: true
+                    focus: true,
+                    type: true,
+                    exercises: {
+                         select: {
+                              id: true,
+                              annotations: true,
+                              name: true,
+                              repetitions: true,
+                              restTime: true,
+                              series: true,
+                              weight: true
+                         }
+                    }
                }
           });
 
@@ -161,7 +167,7 @@ export async function deleteExercise(request: Request, response: Response) {
      });
 
      const { id } = paramsSchema.parse(request.params);
-     
+
      try {
           await prisma.exercises.delete({
                where: {

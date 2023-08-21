@@ -22,17 +22,17 @@ postRoutes.post('/teachers/verify-email', verifyMailForTeacher);
 postRoutes.post('/verify-code', confirmVerificationCode);
 
 // From EXERCISES
-postRoutes.post('/exercises', verifyToken, createExercise);
+postRoutes.post('/exercises/:workoutsId/create', verifyToken, createExercise);
 
 // From SHEETS
-postRoutes.post('/sheets', verifyToken, createSheet);
+postRoutes.post('/sheets/:id/create', verifyToken, createSheet);
 
 // From STUDENTS
 postRoutes.post('/students', createStudent);
 
 // From TEACHERS
 postRoutes.post('/teachers', createTeacher);
-postRoutes.post('/teachers/:teacher/add/:student', addStudentToTeacher);
+postRoutes.post('/teachers/:teacher/add/:student', verifyToken, addStudentToTeacher);
 
 // From UPLOADS
 postRoutes.post('/students/:id/upload', verifyToken, uploader.single('file'), uploadStudentPicture);
