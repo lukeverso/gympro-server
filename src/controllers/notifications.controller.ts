@@ -8,12 +8,31 @@ export async function getStudentNotifications(request: Request, response: Respon
      });
 
      const { id } = requestParams.parse(request.params);
-     
+
      try {
-          const notifications = await prisma.students.findUnique({
+          const student = await prisma.students.findUnique({
                where: {
                     id
+               }
+          });
+
+          if (!student) {
+               return response.status(404).send({
+                    status: 'error',
+                    message: 'Student not found'
+               });
+          }
+
+          const notifications = await prisma.notifications.findMany({
+               where: {
+                    studentsId: id
                },
+               select: {
+                    id: true,
+                    title: true,
+                    content: true,
+                    expanded: true
+               }
           });
 
           return response.status(200).send(notifications);

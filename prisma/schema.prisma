@@ -26,7 +26,6 @@ model Students {
      state      String
 
      teacherId  String?
-     gymId      String?
      measuresId String?
 
      createdAt DateTime @default(now())
@@ -37,6 +36,7 @@ model Students {
      measures       Measures[]
      sheets         Sheets[]
      medicalHistory MedicalHistory[]
+     notifications  Notifications[]
 }
 
 model Teachers {
@@ -60,21 +60,21 @@ model Teachers {
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 
-     gymId String?
-
      students Students[]
 }
 
 model Notifications {
-     id    String  @id @default(uuid())
-     gymId String?
+     id String @id @default(uuid())
 
      title    String
      content  String
      expanded Boolean @default(false)
 
-     createdAt DateTime @default(now())
-     updatedAt DateTime @updatedAt
+     studentsId String?
+
+     createdAt DateTime  @default(now())
+     updatedAt DateTime  @updatedAt
+     student   Students? @relation(fields: [studentsId], references: [id])
 }
 
 model Measures {
@@ -159,37 +159,37 @@ model VerificationCodes {
 }
 
 model MedicalHistory {
-     id String @id @default(uuid())
+     id         String @id @default(uuid())
      studentsId String
 
-     surgicalHistory Boolean
-     oncologicalHistory Boolean
-     hypertension Boolean
-     hypotension Boolean
-     diabetes Boolean
-     epilepsy Boolean
-     smoker Boolean
-     drinker Boolean
-     stressTest Boolean
-     sleepHours Int
-     lifeStyle String
+     surgicalHistory     Boolean
+     oncologicalHistory  Boolean
+     hypertension        Boolean
+     hypotension         Boolean
+     diabetes            Boolean
+     epilepsy            Boolean
+     smoker              Boolean
+     drinker             Boolean
+     stressTest          Boolean
+     sleepHours          Int
+     lifeStyle           String
      timeWithoutTraining Int
-     
-     heartProblem Boolean
-     chestPain Boolean
-     chestPainLastMonth Boolean
-     imbalance Boolean
-     boneJointIssue Boolean
-     medication Boolean
+
+     heartProblem           Boolean
+     chestPain              Boolean
+     chestPainLastMonth     Boolean
+     imbalance              Boolean
+     boneJointIssue         Boolean
+     medication             Boolean
      reasonForNotExercising Boolean
 
-     neckPain Boolean
+     neckPain     Boolean
      shoulderPain Boolean
-     backPain Boolean
-     wristPain Boolean
-     fingerPain Boolean
-     hipPain Boolean
-     kneePain Boolean
+     backPain     Boolean
+     wristPain    Boolean
+     fingerPain   Boolean
+     hipPain      Boolean
+     kneePain     Boolean
 
      student Students @relation(fields: [studentsId], references: [id])
 }
