@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getStudentExercises } from '../controllers/exercises.controller';
-import { getStudentNotifications } from '../controllers/notifications.controller';
+import { getNotificationsByTeacher, getNotificationsForStudent } from '../controllers/notifications.controller';
 import { findStudentByMail, getStudentAddress, getStudentData, getStudentDetails, getStudentEmail, getStudentMeasures, getStudentName, getStudentTelephone } from '../controllers/students.controller';
 import { getTeacherAddress, getTeacherDetails, getTeacherEmail, getTeacherName, getTeacherStudents, getTeacherTelephone } from '../controllers/teachers.controller';
 import { getWorkoutDetails } from '../controllers/workouts.controller';
@@ -12,7 +12,8 @@ const getRoutes = Router();
 getRoutes.get('/exercises/:id', verifyToken, getStudentExercises);
 
 // From NOTIFICATIONS
-getRoutes.get('/notifications/:id', verifyToken, getStudentNotifications);
+getRoutes.get('/notifications/teachers/:teacherId/all', getNotificationsByTeacher);
+getRoutes.get('/notifications/students/:studentId/all', getNotificationsForStudent);
 
 // From STUDENTS
 getRoutes.get('/students/:id', verifyToken, getStudentData);

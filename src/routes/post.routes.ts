@@ -9,6 +9,7 @@ import { createStudent } from '../controllers/students.controller';
 import { addStudentToTeacher, createTeacher } from '../controllers/teachers.controller';
 import { uploadStudentPicture, uploadTeacherPicture } from '../controllers/upload.controller';
 import { createWorkout } from '../controllers/workouts.controller';
+import { createMultipleNotifications, createNotificationForStudent } from '../controllers/notifications.controller';
 
 const uploader = multer();
 
@@ -23,6 +24,10 @@ postRoutes.post('/verify-code', confirmVerificationCode);
 
 // From EXERCISES
 postRoutes.post('/exercises/:workoutsId/create', verifyToken, createExercise);
+
+// From NOTIFICATIONS
+postRoutes.post('/notifications/:teacherId/multiple', createMultipleNotifications);
+postRoutes.post('/notifications/:teacherId/student/:studentId', createNotificationForStudent);
 
 // From SHEETS
 postRoutes.post('/sheets/:id/create', verifyToken, createSheet);

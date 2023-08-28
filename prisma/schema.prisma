@@ -60,7 +60,8 @@ model Teachers {
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 
-     students Students[]
+     students      Students[]
+     notifications Notifications[]
 }
 
 model Notifications {
@@ -70,11 +71,13 @@ model Notifications {
      content  String
      expanded Boolean @default(false)
 
-     studentsId String?
+     teacherId String
 
-     createdAt DateTime  @default(now())
-     updatedAt DateTime  @updatedAt
-     student   Students? @relation(fields: [studentsId], references: [id])
+     createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
+
+     teacher    Teachers   @relation(fields: [teacherId], references: [id])
+     students   Students[]
 }
 
 model Measures {
