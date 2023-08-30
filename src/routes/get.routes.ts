@@ -12,8 +12,8 @@ const getRoutes = Router();
 getRoutes.get('/exercises/:id', verifyToken, getStudentExercises);
 
 // From NOTIFICATIONS
-getRoutes.get('/notifications/teachers/:teacherId/all', getNotificationsByTeacher);
-getRoutes.get('/notifications/students/:studentId/all', getNotificationsForStudent);
+getRoutes.get('/notifications/teachers/:teacherId/all', verifyToken, getNotificationsByTeacher);
+getRoutes.get('/notifications/students/:studentId/all', verifyToken, getNotificationsForStudent);
 
 // From STUDENTS
 getRoutes.get('/students/:id', verifyToken, getStudentData);

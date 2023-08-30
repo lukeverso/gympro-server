@@ -72,31 +72,39 @@ export async function getNotificationsByTeacher(request: Request, response: Resp
      try {
           const { teacherId } = queryParams.parse(request.params);
 
-          const teacherNotifications = await prisma.teachers.findUnique({
+          const teacherNotifications = await prisma.notifications.findMany({
                where: {
-                    id: teacherId,
+                    teacherId: teacherId,
+                    students: {
+                         some: {}
+                    },
                },
                select: {
-                    notifications: {
+                    id: true,
+                    title: true,
+                    content: true,
+                    students: {
                          select: {
-                              id: true,
-                              title: true,
-                              content: true
-                         },
-                    },
+                              id: true
+                         }
+                    }
                },
           });
 
-          if (!teacherNotifications) {
+          console.log(teacherNotifications)
+
+          const filteredNotifications = teacherNotifications.filter(notification => notification.students.length > 1 );
+
+          if (filteredNotifications.length === 0) {
                return response.status(404).json({
                     status: 'error',
-                    message: 'Teacher not found',
+                    message: 'No relevant notifications found',
                });
           }
 
           return response.status(200).json({
                status: 'success',
-               notifications: teacherNotifications.notifications,
+               notifications: filteredNotifications,
           });
      } catch (error) {
           console.error(error);

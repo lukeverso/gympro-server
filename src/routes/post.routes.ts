@@ -26,8 +26,8 @@ postRoutes.post('/verify-code', confirmVerificationCode);
 postRoutes.post('/exercises/:workoutsId/create', verifyToken, createExercise);
 
 // From NOTIFICATIONS
-postRoutes.post('/notifications/:teacherId/multiple', createMultipleNotifications);
-postRoutes.post('/notifications/:teacherId/student/:studentId', createNotificationForStudent);
+postRoutes.post('/notifications/:teacherId/multiple', verifyToken, createMultipleNotifications);
+postRoutes.post('/notifications/:teacherId/student/:studentId', verifyToken, createNotificationForStudent);
 
 // From SHEETS
 postRoutes.post('/sheets/:id/create', verifyToken, createSheet);
