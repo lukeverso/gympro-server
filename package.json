@@ -4,7 +4,8 @@
      "description": "Server for GymPro",
      "main": "src/index.ts",
      "scripts": {
-          "dev": "npx nodemon src/server.ts"
+          "dev": "npx nodemon src/server.ts",
+          "vercel-build": "npx prisma migrate deploy"
      },
      "author": "Lucas Cristovam",
      "license": "ISC",
