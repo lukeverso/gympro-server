@@ -241,6 +241,33 @@ export async function addStudentToTeacher(request: Request, response: Response) 
      const { teacher, student } = params.parse(request.params);
 
      try {
+          const existingStudent = await prisma.students.findUnique({
+               where: {
+                    id: student
+               },
+               select: {
+                    teacherId: true,
+                    id: true
+               }
+          });
+
+          if (existingStudent) {
+               if (existingStudent.teacherId === teacher) {
+                    return response.status(400).send({
+                         status: 'error',
+                         message: 'This student is already assigned to this teacher.',
+                         code: 'sameTeacher',
+                         student: existingStudent.id
+                    });
+               } else {
+                    return response.status(400).send({
+                         status: 'error',
+                         message: 'This student is already assigned to a different teacher.',
+                         code: 'differentTeacher'
+                    });
+               }
+          }
+
           await prisma.teachers.update({
                where: {
                     id: teacher
@@ -268,7 +295,8 @@ export async function addStudentToTeacher(request: Request, response: Response) 
      };
 };
 
-export async function name(request: Request, response: Response) {
+
+export async function removeStudentFromTeacher(request: Request, response: Response) {
      const params = z.object({
           teacher: z.string().uuid(),
           student: z.string().uuid()
@@ -659,7 +687,7 @@ export async function updateTeacherAddress(request: Request, response: Response)
           });
      } catch (error) {
           console.log(error);
-          
+
           return response.status(500).send({
                status: 'error',
                message: `Ocorreu um erro: ${error}`

@@ -91,9 +91,7 @@ export async function getNotificationsByTeacher(request: Request, response: Resp
                },
           });
 
-          console.log(teacherNotifications)
-
-          const filteredNotifications = teacherNotifications.filter(notification => notification.students.length > 1 );
+          const filteredNotifications = teacherNotifications.filter(notification => notification.students.length > 1);
 
           if (filteredNotifications.length === 0) {
                return response.status(404).json({
@@ -215,6 +213,34 @@ export async function getNotificationsForStudent(request: Request, response: Res
           return response.status(200).json({
                status: 'success',
                notifications: studentNotifications.notifications,
+          });
+     } catch (error) {
+          console.error(error);
+
+          return response.status(500).json({
+               status: 'error',
+               message: `Ocorreu um erro: ${error}`,
+          });
+     };
+};
+
+export async function deleteNotification(request: Request, response: Response) {
+     const paramsSchema = z.object({
+          id: z.string().uuid()
+     });
+
+     const { id } = paramsSchema.parse(request.params);
+
+     try {
+          await prisma.notifications.delete({
+               where: {
+                    id
+               }
+          });
+
+          return response.status(200).send({
+               status: 'success',
+               message: 'Notification deleted successfully.'
           });
      } catch (error) {
           console.error(error);
