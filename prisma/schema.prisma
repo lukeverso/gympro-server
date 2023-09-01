@@ -175,9 +175,9 @@ model MedicalHistory {
      smoker              Boolean
      drinker             Boolean
      stressTest          Boolean
-     sleepHours          Int
+     sleepHours          String
      lifeStyle           Boolean
-     timeWithoutTraining Int
+     timeWithoutTraining String
 
      heartProblem           Boolean
      chestPain              Boolean

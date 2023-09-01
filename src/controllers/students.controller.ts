@@ -833,92 +833,92 @@ export async function fillMedicalHistorySheet(request: Request, response: Respon
      const { studentId } = params.parse(request.params);
 
      const body = z.object({
-          surgerySwitch: z.boolean(),
-          oncologySwitch: z.boolean(),
-          hypertensionSwitch: z.boolean(),
-          hypotensionSwitch: z.boolean(),
-          diabetesSwitch: z.boolean(),
-          epilepsySwitch: z.boolean(),
-          smokingSwitch: z.boolean(),
-          alcooholSwitch: z.boolean(),
-          recentTestsSwitch: z.boolean(),
+          backPain: z.boolean(),
+          boneJointIssue: z.boolean(),
+          chestPain: z.boolean(),
+          chestPainLastMonth: z.boolean(),
+          diabetes: z.boolean(),
+          drinker: z.boolean(),
+          epilepsy: z.boolean(),
+          fingerPain: z.boolean(),
+          heartProblem: z.boolean(),
+          hipPain: z.boolean(),
+          hypertension: z.boolean(),
+          hypotension: z.boolean(),
+          imbalance: z.boolean(),
+          kneePain: z.boolean(),
           lifeStyle: z.boolean(),
-          neckPainSwitch: z.boolean(),
-          shouldersPainSwitch: z.boolean(),
-          backPainSwitch: z.boolean(),
-          wristPainSwitch: z.boolean(),
-          fingersPainSwitch: z.boolean(),
-          hipPainSwitch: z.boolean(),
-          kneePainSwitch: z.boolean(),
-          heartTroubleSwitch: z.boolean(),
-          chestPainSwitch: z.boolean(),
-          chestPainLastMonthSwitch: z.boolean(),
-          conscienceLostSwitch: z.boolean(),
-          boneProblemSwitch: z.boolean(),
-          medicineSwitch: z.boolean(),
-          sleepHour: z.number(),
-          noAcademia: z.number(),
-          moreReasons: z.string(),
+          medication: z.boolean(),
+          neckPain: z.boolean(),
+          oncologicalHistory: z.boolean(),
+          reasonForNotExercising: z.string(),
+          shoulderPain: z.boolean(),
+          sleepHours: z.string(),
+          smoker: z.boolean(),
+          stressTest: z.boolean(),
+          surgicalHistory: z.boolean(),
+          timeWithoutTraining: z.string(),
+          wristPain: z.boolean()
      });
 
      const {
-          surgerySwitch,
-          oncologySwitch,
-          hypertensionSwitch,
-          hypotensionSwitch,
-          diabetesSwitch,
-          epilepsySwitch,
-          smokingSwitch,
-          alcooholSwitch,
-          recentTestsSwitch,
+          backPain,
+          boneJointIssue,
+          chestPain,
+          chestPainLastMonth,
+          diabetes,
+          drinker,
+          epilepsy,
+          fingerPain,
+          heartProblem,
+          hipPain,
+          hypertension,
+          hypotension,
+          imbalance,
+          kneePain,
           lifeStyle,
-          neckPainSwitch,
-          shouldersPainSwitch,
-          backPainSwitch,
-          wristPainSwitch,
-          fingersPainSwitch,
-          hipPainSwitch,
-          kneePainSwitch,
-          heartTroubleSwitch,
-          chestPainSwitch,
-          chestPainLastMonthSwitch,
-          conscienceLostSwitch,
-          boneProblemSwitch,
-          medicineSwitch,
-          sleepHour,
-          noAcademia,
-          moreReasons
+          medication,
+          neckPain,
+          oncologicalHistory,
+          reasonForNotExercising,
+          shoulderPain,
+          sleepHours,
+          smoker,
+          stressTest,
+          surgicalHistory,
+          timeWithoutTraining,
+          wristPain
      } = body.parse(request.body);
 
      try {
           await prisma.medicalHistory.create({
                data: {
-                    backPain: backPainSwitch,
-                    boneJointIssue: boneProblemSwitch,
-                    chestPain: chestPainSwitch,
-                    chestPainLastMonth: chestPainLastMonthSwitch,
-                    diabetes: diabetesSwitch,
-                    drinker: alcooholSwitch,
-                    epilepsy: epilepsySwitch,
-                    fingerPain: fingersPainSwitch,
-                    heartProblem: heartTroubleSwitch,
-                    hipPain: hipPainSwitch,
-                    hypertension: hypertensionSwitch,
-                    hypotension: hypotensionSwitch,
-                    imbalance: conscienceLostSwitch,
-                    kneePain: kneePainSwitch,
-                    lifeStyle: lifeStyle,
-                    medication: medicineSwitch,
-                    neckPain: neckPainSwitch,
-                    oncologicalHistory: oncologySwitch,
-                    reasonForNotExercising: moreReasons,
-                    shoulderPain: shouldersPainSwitch,
-                    sleepHours: sleepHour,
-                    smoker: smokingSwitch,
-                    stressTest: recentTestsSwitch,
-                    surgicalHistory: surgerySwitch,
-                    timeWithoutTraining: noAcademia,
-                    wristPain: wristPainSwitch,
+                    backPain,
+                    boneJointIssue,
+                    chestPain,
+                    chestPainLastMonth,
+                    diabetes,
+                    drinker,
+                    epilepsy,
+                    fingerPain,
+                    heartProblem,
+                    hipPain,
+                    hypertension,
+                    hypotension,
+                    imbalance,
+                    kneePain,
+                    lifeStyle,
+                    medication,
+                    neckPain,
+                    oncologicalHistory,
+                    reasonForNotExercising,
+                    shoulderPain,
+                    sleepHours,
+                    smoker,
+                    stressTest,
+                    surgicalHistory,
+                    timeWithoutTraining,
+                    wristPain,
                     studentsId: studentId,
                     filled: true
                }
@@ -928,6 +928,65 @@ export async function fillMedicalHistorySheet(request: Request, response: Respon
                status: 'success',
                message: 'Ficha preenchida com sucesso.'
           });
+     } catch (error) {
+          console.log(error);
+
+          return response.status(500).send({
+               status: 'error',
+               message: `Ocorreu um erro: ${error}`
+          });
+     };
+};
+
+export async function getStudentMedicalHistory(request: Request, response: Response) {
+     const params = z.object({
+          id: z.string().uuid()
+     });
+
+     const { id } = params.parse(request.params);
+
+     try {
+          const student = await prisma.students.findUnique({
+               where: {
+                    id
+               },
+               select: {
+                    medicalHistory: {
+                         select: {
+                              backPain: true,
+                              boneJointIssue: true,
+                              chestPain: true,
+                              chestPainLastMonth: true,
+                              diabetes: true,
+                              drinker: true,
+                              epilepsy: true,
+                              filled: true,
+                              fingerPain: true,
+                              heartProblem: true,
+                              hipPain: true,
+                              hypertension: true,
+                              hypotension: true,
+                              imbalance: true,
+                              kneePain: true,
+                              lifeStyle: true,
+                              medication: true,
+                              neckPain: true,
+                              oncologicalHistory: true,
+                              reasonForNotExercising: true,
+                              shoulderPain: true,
+                              sleepHours: true,
+                              smoker: true,
+                              stressTest: true,
+                              student: true,
+                              surgicalHistory: true,
+                              timeWithoutTraining: true,
+                              wristPain: true
+                         }
+                    }
+               }
+          });
+
+          return response.status(200).send(student);
      } catch (error) {
           console.log(error);
 

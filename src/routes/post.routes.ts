@@ -34,7 +34,7 @@ postRoutes.post('/sheets/:id/create', verifyToken, createSheet);
 
 // From STUDENTS
 postRoutes.post('/students', createStudent);
-postRoutes.post('/students/:studentId/medical-history', fillMedicalHistorySheet);
+postRoutes.post('/students/:studentId/medical-history', verifyToken, fillMedicalHistorySheet);
 
 // From TEACHERS
 postRoutes.post('/teachers', createTeacher);

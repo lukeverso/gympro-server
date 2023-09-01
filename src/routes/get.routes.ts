@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { getStudentExercises } from '../controllers/exercises.controller';
 import { getNotificationsByTeacher, getNotificationsForStudent } from '../controllers/notifications.controller';
-import { findStudentByMail, getStudentAddress, getStudentData, getStudentDetails, getStudentEmail, getStudentMeasures, getStudentName, getStudentTelephone } from '../controllers/students.controller';
+import { findStudentByMail, getStudentAddress, getStudentData, getStudentDetails, getStudentEmail, getStudentMeasures, getStudentMedicalHistory, getStudentName, getStudentTelephone } from '../controllers/students.controller';
 import { getTeacherAddress, getTeacherDetails, getTeacherEmail, getTeacherName, getTeacherStudents, getTeacherTelephone } from '../controllers/teachers.controller';
 import { getWorkoutDetails } from '../controllers/workouts.controller';
 import { verifyToken } from '../lib/jwtVerify';
@@ -24,6 +24,7 @@ getRoutes.get('/students/:id/email', verifyToken, getStudentEmail);
 getRoutes.get('/students/:id/telephone', verifyToken, getStudentTelephone);
 getRoutes.get('/students/:id/address', verifyToken, getStudentAddress);
 getRoutes.get('/students/:id/measures', verifyToken, getStudentMeasures);
+getRoutes.get('/students/:id/medical-history', verifyToken, getStudentMedicalHistory);
 
 // From TEACHERS
 getRoutes.get('/teachers/:id', verifyToken, getTeacherDetails);
