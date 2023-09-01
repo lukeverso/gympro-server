@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
+import { nodemailerTransport } from '../lib/nodemailer';
 
 function generateRandomCode(length: number) {
      let result = '';
@@ -165,14 +166,7 @@ export async function verifyMailForStudent(request: Request, response: Response)
                }
           });
 
-          const transport = nodemailer.createTransport({
-               host: 'smtp-relay.brevo.com',
-               port: 587,
-               auth: {
-                    user: 'cristhovamlucas@gmail.com',
-                    pass: 'FcvrRdD28JPCbwLs'
-               }
-          });
+          const transport = nodemailerTransport();
 
           const html = `<!DOCTYPE html>
           <html lang="pt-br">          
@@ -300,14 +294,7 @@ export async function verifyMailForTeacher(request: Request, response: Response)
                }
           });
 
-          const transport = nodemailer.createTransport({
-               host: 'smtp-relay.brevo.com',
-               port: 587,
-               auth: {
-                    user: 'contatogymproapp@gmail.com',
-                    pass: 'FcvrRdD28JPCbwLs'
-               }
-          });
+          const transport = nodemailerTransport();
 
           const html = `<!DOCTYPE html>
           <html lang="pt-br">          

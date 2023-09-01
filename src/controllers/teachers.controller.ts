@@ -259,7 +259,7 @@ export async function addStudentToTeacher(request: Request, response: Response) 
                          code: 'sameTeacher',
                          student: existingStudent.id
                     });
-               } else {
+               } else if (existingStudent.teacherId !== null) {
                     return response.status(400).send({
                          status: 'error',
                          message: 'This student is already assigned to a different teacher.',

@@ -3,7 +3,8 @@ generator client {
 }
 
 datasource db {
-     provider = "postgresql"
+     provider = "sqlite"
+     // provider = "postgresql"
      url      = env("DATABASE_URL")
 }
 
@@ -175,7 +176,7 @@ model MedicalHistory {
      drinker             Boolean
      stressTest          Boolean
      sleepHours          Int
-     lifeStyle           String
+     lifeStyle           Boolean
      timeWithoutTraining Int
 
      heartProblem           Boolean
@@ -184,7 +185,7 @@ model MedicalHistory {
      imbalance              Boolean
      boneJointIssue         Boolean
      medication             Boolean
-     reasonForNotExercising Boolean
+     reasonForNotExercising String
 
      neckPain     Boolean
      shoulderPain Boolean
@@ -193,6 +194,8 @@ model MedicalHistory {
      fingerPain   Boolean
      hipPain      Boolean
      kneePain     Boolean
+
+     filled Boolean @default(false)
 
      student Students @relation(fields: [studentsId], references: [id])
 }

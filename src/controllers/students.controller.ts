@@ -539,7 +539,7 @@ export async function updateStudentTelephone(request: Request, response: Respons
      });
 
      const { telephone } = body.parse(request.body);
-     
+
      try {
           const student = await prisma.students.findFirst({
                where: {
@@ -586,7 +586,7 @@ export async function getStudentAddress(request: Request, response: Response) {
      });
 
      const { id } = params.parse(request.params);
-     
+
      try {
           const student = await prisma.students.findFirst({
                where: {
@@ -645,7 +645,7 @@ export async function updateStudentAddress(request: Request, response: Response)
           state,
           street
      } = body.parse(request.body);
-     
+
      try {
           const student = await prisma.students.findFirst({
                where: {
@@ -698,7 +698,7 @@ export async function getStudentMeasures(request: Request, response: Response) {
      });
 
      const { id } = params.parse(request.params);
-     
+
      try {
           const measures = await prisma.students.findFirst({
                where: {
@@ -748,36 +748,36 @@ export async function updateStudentMeasures(request: Request, response: Response
      });
 
      const { id } = params.parse(request.params);
-     
+
+     const body = z.object({
+          arm: z.string(),
+          bmi: z.string(),
+          calf: z.string(),
+          chest: z.string(),
+          height: z.string(),
+          hip: z.string(),
+          shoulders: z.string(),
+          thigh: z.string(),
+          waist: z.string(),
+          weight: z.string(),
+          wingspan: z.string()
+     });
+
+     const {
+          arm,
+          bmi,
+          calf,
+          chest,
+          height,
+          hip,
+          shoulders,
+          thigh,
+          waist,
+          weight,
+          wingspan
+     } = body.parse(request.body);
+
      try {
-          const body = z.object({
-               arm: z.string(),
-               bmi: z.string(),
-               calf: z.string(),
-               chest: z.string(),
-               height: z.string(),
-               hip: z.string(),
-               shoulders: z.string(),
-               thigh: z.string(),
-               waist: z.string(),
-               weight: z.string(),
-               wingspan: z.string()
-          });
-
-          const {
-               arm,
-               bmi,
-               calf,
-               chest,
-               height,
-               hip,
-               shoulders,
-               thigh,
-               waist,
-               weight,
-               wingspan
-          } = body.parse(request.body);
-
           const student = await prisma.students.findFirst({
                where: {
                     id
@@ -817,6 +817,119 @@ export async function updateStudentMeasures(request: Request, response: Response
                     message: error.errors[0].message
                });
           };
+
+          return response.status(500).send({
+               status: 'error',
+               message: `Ocorreu um erro: ${error}`
+          });
+     };
+};
+
+export async function fillMedicalHistorySheet(request: Request, response: Response) {
+     const params = z.object({
+          studentId: z.string().uuid()
+     });
+
+     const { studentId } = params.parse(request.params);
+
+     const body = z.object({
+          surgerySwitch: z.boolean(),
+          oncologySwitch: z.boolean(),
+          hypertensionSwitch: z.boolean(),
+          hypotensionSwitch: z.boolean(),
+          diabetesSwitch: z.boolean(),
+          epilepsySwitch: z.boolean(),
+          smokingSwitch: z.boolean(),
+          alcooholSwitch: z.boolean(),
+          recentTestsSwitch: z.boolean(),
+          lifeStyle: z.boolean(),
+          neckPainSwitch: z.boolean(),
+          shouldersPainSwitch: z.boolean(),
+          backPainSwitch: z.boolean(),
+          wristPainSwitch: z.boolean(),
+          fingersPainSwitch: z.boolean(),
+          hipPainSwitch: z.boolean(),
+          kneePainSwitch: z.boolean(),
+          heartTroubleSwitch: z.boolean(),
+          chestPainSwitch: z.boolean(),
+          chestPainLastMonthSwitch: z.boolean(),
+          conscienceLostSwitch: z.boolean(),
+          boneProblemSwitch: z.boolean(),
+          medicineSwitch: z.boolean(),
+          sleepHour: z.number(),
+          noAcademia: z.number(),
+          moreReasons: z.string(),
+     });
+
+     const {
+          surgerySwitch,
+          oncologySwitch,
+          hypertensionSwitch,
+          hypotensionSwitch,
+          diabetesSwitch,
+          epilepsySwitch,
+          smokingSwitch,
+          alcooholSwitch,
+          recentTestsSwitch,
+          lifeStyle,
+          neckPainSwitch,
+          shouldersPainSwitch,
+          backPainSwitch,
+          wristPainSwitch,
+          fingersPainSwitch,
+          hipPainSwitch,
+          kneePainSwitch,
+          heartTroubleSwitch,
+          chestPainSwitch,
+          chestPainLastMonthSwitch,
+          conscienceLostSwitch,
+          boneProblemSwitch,
+          medicineSwitch,
+          sleepHour,
+          noAcademia,
+          moreReasons
+     } = body.parse(request.body);
+
+     try {
+          await prisma.medicalHistory.create({
+               data: {
+                    backPain: backPainSwitch,
+                    boneJointIssue: boneProblemSwitch,
+                    chestPain: chestPainSwitch,
+                    chestPainLastMonth: chestPainLastMonthSwitch,
+                    diabetes: diabetesSwitch,
+                    drinker: alcooholSwitch,
+                    epilepsy: epilepsySwitch,
+                    fingerPain: fingersPainSwitch,
+                    heartProblem: heartTroubleSwitch,
+                    hipPain: hipPainSwitch,
+                    hypertension: hypertensionSwitch,
+                    hypotension: hypotensionSwitch,
+                    imbalance: conscienceLostSwitch,
+                    kneePain: kneePainSwitch,
+                    lifeStyle: lifeStyle,
+                    medication: medicineSwitch,
+                    neckPain: neckPainSwitch,
+                    oncologicalHistory: oncologySwitch,
+                    reasonForNotExercising: moreReasons,
+                    shoulderPain: shouldersPainSwitch,
+                    sleepHours: sleepHour,
+                    smoker: smokingSwitch,
+                    stressTest: recentTestsSwitch,
+                    surgicalHistory: surgerySwitch,
+                    timeWithoutTraining: noAcademia,
+                    wristPain: wristPainSwitch,
+                    studentsId: studentId,
+                    filled: true
+               }
+          });
+
+          return response.status(200).send({
+               status: 'success',
+               message: 'Ficha preenchida com sucesso.'
+          });
+     } catch (error) {
+          console.log(error);
 
           return response.status(500).send({
                status: 'error',
