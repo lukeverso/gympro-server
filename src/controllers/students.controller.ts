@@ -950,7 +950,7 @@ export async function getStudentMedicalHistory(request: Request, response: Respo
                where: {
                     id
                },
-               select: {
+               include: {
                     medicalHistory: {
                          select: {
                               backPain: true,
@@ -987,6 +987,56 @@ export async function getStudentMedicalHistory(request: Request, response: Respo
           });
 
           return response.status(200).send(student);
+     } catch (error) {
+          console.log(error);
+
+          return response.status(500).send({
+               status: 'error',
+               message: `Ocorreu um erro: ${error}`
+          });
+     };
+};
+
+export async function allowEditMedicalHistory(request: Request, response: Response) {
+     const params = z.object({
+          studentId: z.string().uuid()
+     });
+
+     const { studentId } = params.parse(request.params);
+
+     try {
+          const medicalHistory = await prisma.students.findUnique({
+               where: {
+                    id: studentId
+               },
+               include: {
+                    medicalHistory: {
+                         select: {
+                              id: true
+                         }
+                    }
+               }
+          });
+
+          if (!medicalHistory || !medicalHistory.medicalHistory || medicalHistory.medicalHistory.length === 0) {
+               return response.status(404).send({
+                    status: 'error',
+                    message: 'Registro de histórico médico não encontrado para o aluno.'
+               });
+          };
+
+          const medicalHistoryId = medicalHistory.medicalHistory[0].id;
+
+          await prisma.medicalHistory.delete({
+               where: {
+                    id: medicalHistoryId
+               }
+          });
+
+          return response.status(200).send({
+               status: 'success',
+               message: 'Status atualizado com sucesso.'
+          });
      } catch (error) {
           console.log(error);
 

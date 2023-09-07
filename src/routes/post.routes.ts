@@ -5,7 +5,7 @@ import multer from 'multer';
 import { confirmVerificationCode, loginStudent, loginTeacher, verifyMailForStudent, verifyMailForTeacher } from '../controllers/auth.controller';
 import { createExercise } from '../controllers/exercises.controller';
 import { createSheet } from '../controllers/sheets.controller';
-import { createStudent, fillMedicalHistorySheet } from '../controllers/students.controller';
+import { allowEditMedicalHistory, createStudent, fillMedicalHistorySheet } from '../controllers/students.controller';
 import { addStudentToTeacher, createTeacher } from '../controllers/teachers.controller';
 import { uploadStudentPicture, uploadTeacherPicture } from '../controllers/upload.controller';
 import { createWorkout } from '../controllers/workouts.controller';
@@ -35,6 +35,7 @@ postRoutes.post('/sheets/:id/create', verifyToken, createSheet);
 // From STUDENTS
 postRoutes.post('/students', createStudent);
 postRoutes.post('/students/:studentId/medical-history', verifyToken, fillMedicalHistorySheet);
+postRoutes.post('/students/:studentId/medical-history/update', verifyToken, allowEditMedicalHistory);
 
 // From TEACHERS
 postRoutes.post('/teachers', createTeacher);

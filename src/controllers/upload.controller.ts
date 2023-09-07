@@ -17,8 +17,6 @@ export async function uploadStudentPicture(request: Request, response: Response)
 
      const { id } = paramsSchema.parse(request.params);
 
-     console.log(request);
-
      try {
           const student = await prisma.students.findUnique({
                where: {
