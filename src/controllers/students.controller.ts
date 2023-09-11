@@ -919,8 +919,7 @@ export async function fillMedicalHistorySheet(request: Request, response: Respon
                     surgicalHistory,
                     timeWithoutTraining,
                     wristPain,
-                    studentsId: studentId,
-                    filled: true
+                    studentsId: studentId
                }
           });
 
@@ -960,7 +959,6 @@ export async function getStudentMedicalHistory(request: Request, response: Respo
                               diabetes: true,
                               drinker: true,
                               epilepsy: true,
-                              filled: true,
                               fingerPain: true,
                               heartProblem: true,
                               hipPain: true,

@@ -50,7 +50,7 @@ export async function loginStudent(request: Request, response: Response) {
           const token = jwt.sign({
                id: studentExists.id
           }, process.env.JWT_SECRET as string, {
-               expiresIn: '7 days'
+               expiresIn: '24h'
           });
 
           const user = {
@@ -102,7 +102,7 @@ export async function loginTeacher(request: Request, response: Response) {
           const token = jwt.sign({
                id: teacherExists.id
           }, process.env.JWT_SECRET as string, {
-               expiresIn: '7 days'
+               expiresIn: '24h'
           });
 
           const teacher = {
