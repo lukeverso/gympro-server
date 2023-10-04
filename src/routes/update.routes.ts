@@ -1,9 +1,13 @@
 import { Router } from 'express';
 import { updateStudentAddress, updateStudentEmail, updateStudentMeasures, updateStudentName, updateStudentStatus, updateStudentTelephone } from '../controllers/students.controller';
 import { removeStudentFromTeacher, updateTeacherAddress, updateTeacherEmail, updateTeacherName, updateTeacherTelephone } from '../controllers/teachers.controller';
+import { updateExercise } from '../controllers/exercises.controller';
 import { verifyToken } from '../lib/jwtVerify';
 
 const updateRoutes = Router();
+
+// From EXERCISES
+updateRoutes.patch('/exercises/:id', verifyToken, updateExercise);
 
 // From STUDENTS
 updateRoutes.patch('/students/:id/status', verifyToken, updateStudentStatus);
