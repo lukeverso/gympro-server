@@ -129,6 +129,13 @@ export async function getExercise(request: Request, response: Response) {
                     weight: true
                }
           });
+
+          if (!exercise) return response.status(400).send({
+               status: 'error',
+               message: `No exercise was found.`,
+          })
+
+          return response.status(200).send(exercise);
      } catch (error) {
           console.log(error);
 
