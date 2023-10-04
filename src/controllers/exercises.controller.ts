@@ -107,6 +107,38 @@ export async function createExercise(request: Request, response: Response) {
      };
 };
 
+export async function getExercise(request: Request, response: Response) {
+     const paramsSchema = z.object({
+          id: z.string().uuid()
+     });
+
+     const { id } = paramsSchema.parse(request.params);
+
+     try {
+          const exercise = await prisma.exercises.findUnique({
+               where: {
+                    id
+               },
+               select: {
+                    id: true,
+                    annotations: true,
+                    name: true,
+                    repetitions: true,
+                    restTime: true,
+                    series: true,
+                    weight: true
+               }
+          });
+     } catch (error) {
+          console.log(error);
+
+          return response.status(500).send({
+               status: 'error',
+               message: `An error occurred: ${error}`,
+          });
+     };
+};
+
 export async function updateExercise(request: Request, response: Response) {
      const bodySchema = z.object({
           name: z.string(),

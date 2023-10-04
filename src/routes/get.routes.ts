@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getStudentExercises } from '../controllers/exercises.controller';
+import { getExercise, getStudentExercises } from '../controllers/exercises.controller';
 import { getNotificationsByTeacher, getNotificationsForStudent } from '../controllers/notifications.controller';
 import { findStudentByMail, getStudentAddress, getStudentData, getStudentDetails, getStudentEmail, getStudentMeasures, getStudentMedicalHistory, getStudentName, getStudentTelephone } from '../controllers/students.controller';
 import { getTeacherAddress, getTeacherDetails, getTeacherEmail, getTeacherName, getTeacherStudents, getTeacherTelephone } from '../controllers/teachers.controller';
@@ -10,6 +10,7 @@ const getRoutes = Router();
 
 // From EXERCISES
 getRoutes.get('/exercises/:id', verifyToken, getStudentExercises);
+getRoutes.get('/exercises/exercise/:id', verifyToken, getExercise);
 
 // From NOTIFICATIONS
 getRoutes.get('/notifications/teachers/:teacherId/all', verifyToken, getNotificationsByTeacher);
