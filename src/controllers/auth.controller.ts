@@ -106,7 +106,9 @@ export async function loginTeacher(request: Request, response: Response) {
           });
 
           const teacher = {
-               id: teacherExists.id
+               id: teacherExists.id,
+               name: teacherExists.name,
+               email: teacherExists.email
           };
 
           return response.status(200).send({
