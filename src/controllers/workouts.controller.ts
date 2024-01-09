@@ -104,6 +104,12 @@ export async function deleteWorkout(request: Request, response: Response) {
      const { id } = paramsSchema.parse(request.params);
 
      try {
+		await prisma.exercises.deleteMany({
+			where: {
+				workoutsId: id
+			}
+		});
+
           await prisma.workouts.delete({
                where: {
                     id
