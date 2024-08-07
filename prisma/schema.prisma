@@ -2,9 +2,15 @@ generator client {
      provider = "prisma-client-js"
 }
 
+generator erd {
+     provider = "prisma-erd-generator"
+     output = "../ERD.png"
+}
+
 datasource db {
      // provider = "sqlite"
      provider = "postgresql"
+     // url      = "file:./dev.db"
      url      = env("DATABASE_URL")
 }
 
@@ -77,8 +83,8 @@ model Notifications {
      createdAt DateTime @default(now())
      updatedAt DateTime @updatedAt
 
-     teacher    Teachers   @relation(fields: [teacherId], references: [id])
-     students   Students[]
+     teacher  Teachers   @relation(fields: [teacherId], references: [id])
+     students Students[]
 }
 
 model Measures {
